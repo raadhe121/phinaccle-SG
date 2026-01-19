@@ -1,0 +1,97 @@
+{
+  "title": "Lifestyle Survey Basic",
+  "sections": [
+    {
+      "title": "Personal Information",
+      "fields": [
+        {
+          "id": "ethnic_group",
+          "title": "Ethnic Group",
+          "type": "Radio",
+          "options": ["Chinese", "Malay", "Indian", "Others"]
+        },
+        {
+          "id": "height",
+          "title": "Height (cm)",
+          "type": "Number"
+        },
+        {
+          "id": "weight",
+          "title": "Weight (kg)",
+          "type": "Number"
+        }
+      ]
+    },
+    {
+      "title": "Diabetes risk assessment, Physical & Mental wellbeing check",
+      "fields": [
+        {
+          "id": "diabetes",
+          "title": "Do you have a parent, sibling and/or child diagnosed with Type 2 diabetes?",
+          "type": "Radio",
+          "options": ["Yes", "No"]
+        },
+        {
+          "id": "hypertension",
+          "title": "Have you ever been told by your doctor that you have high blood pressure (hypertension)?",
+          "type": "Radio",
+          "options": ["Yes", "No"]
+        },
+        {
+          "id": "exercise",
+          "title": "On the average, how many days do you exercise per week in the last four weeks? (At least 30 minutes or more of medium physical activity such as brisk walking, stair climbing, etc.)",
+          "type": "Radio",
+          "options": ["Never", "1-2 days per week", "3-4 days per week", "5-7 days per week"]
+        },
+        {
+          "id": "smoke",
+          "title": "Did you smoke in the last 4 weeks?",
+          "type": "Radio",
+          "options": ["Never", "Occasionally", "Often, within ½ pack per day", "Often, at least ½ pack per day"]
+        },
+        {
+          "id": "alcohol",
+          "title": "Did you consume alcohol in the last 4 weeks? (40ml of alcohol equivalent to about 2 drinks of a liquor?",
+          "type": "Radio",
+          "options": ["Never", "Seldom", "Often, less than 40ml each time"]
+        },
+        {
+          "id": "diet",
+          "title": "Is there a difference in your daily life diet in comparison with the recommended healthy diet* in the last 4 weeks.\n\n*Healthy diet refers to: Adequate diet, discipline, different varieties. More fruits and vegetables, coarse grains, non-fat, low fat or dairy products; Adequate high cholesterol food, sugar and fried food. Less salt (5-6g/day).",
+          "type": "Radio",
+          "options": ["About the same", "Slight Difference", "Significant difference", "Quite a difference"]
+        },
+        {
+          "id": "sugary_beverages",
+          "title": "How often do you drink sugary beverages? Examples of sugary beverages are soft drinks, fruit juice, yoghurt drinks, coffee, tea and bubble tea.",
+          "type": "Radio",
+          "options": ["0-2 times per week", "3-6 times per week", "7 or more times per week"]
+        },
+        {
+          "id": "sleep",
+          "title": "In the last 4 weeks, how many days was your sleep less than 6 hours?",
+          "type": "Radio",
+          "options": ["0-5 days", "6-10 days", "More than 10 days, but seldom overnight", "More than 10 days, and often overnight"]
+        },
+        {
+          "id": "overall_pressure",
+          "title": "In the last 6 months, your overall pressure* is?\n*Pressure includes: family, marriage, love, economy, children's education, health, care for the elderly and so on.",
+          "type": "Radio",
+          "options": ["Low", "Average", "High", "Very High"]
+        },
+        {
+          "id": "work_stress",
+          "title": "In the last 6 months, your stress level at work is?",
+          "type": "Radio",
+          "options": ["Low", "Average", "High", "Very High"]
+        },
+        {
+          "id": "health_productivity",
+          "title": "During the past 4 weeks, how much did your health problems affect your productivity while you were working?",
+          "type": "Radio",
+          "options": ["No health problems", "None of the time", "Some of the time", "Most of the time", "All the above"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+diff --git a/node_modules/@2c2p/pgw-sdk-react-native/android/build.gradle b/node_modules/@2c2p/pgw-sdk-react-native/android/build.gradle
+index f68054c..dd5a8c8 100644
+--- a/node_modules/@2c2p/pgw-sdk-react-native/android/build.gradle
++++ b/node_modules/@2c2p/pgw-sdk-react-native/android/build.gradle
+@@ -72,5 +72,7 @@ repositories {
+ dependencies {
+ 
+     implementation 'com.facebook.react:react-native:+'
+-    implementation 'com.2c2p:pgw-ui-sdk:4.0.4'
++    implementation('com.2c2p:pgw-ui-sdk:4.0.4') {
++        exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
++    }
+ }

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "114842305338",
+    "project_id": "pinnaclesg-da6ed",
+    "storage_bucket": "pinnaclesg-da6ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114842305338:android:63d28fe62b918aa9ba0603",
+        "android_client_info": {
+          "package_name": "sg.com.pinnaclefamilyclinic.pinnaclesgplus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgyrECk99X3O_oDB3ODk5e9CVACjhOnkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114842305338:android:8cc90be038775ec7ba0603",
+        "android_client_info": {
+          "package_name": "sg.com.pinnaclefamilyclinic.pinnaclesgplus.doctor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgyrECk99X3O_oDB3ODk5e9CVACjhOnkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

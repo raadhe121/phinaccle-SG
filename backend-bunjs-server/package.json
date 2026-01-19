@@ -1,0 +1,16 @@
+{
+  "name": "backend-nodejs-server",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.1.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@react-pdf/renderer": "^4.3.0",
+    "react": "^19.1.0"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "title": "NKF",
+  "sections": [
+    {
+      "title": "Personal Particulars of Patient",
+      "fields": [
+        {
+          "id": "race",
+          "title": "Race",
+          "type": "Radio",
+          "required": true,
+          "options": ["Chinese", "Malay", "Indian", "Others"]
+        }
+      ]
+    },
+    {
+      "title": "Risk Factors for CKD (Please tick accordingly)",
+      "fields": [
+        {
+          "id": "family_history",
+          "title": "Family history risk factors",
+          "type": "Checkbox",
+          "required": false,
+          "options": ["Diabetes", "Hypertension", "CKD or ESRD"]
+        },
+        {
+          "id": "height",
+          "title": "Height (cm)",
+          "type": "Number"
+        },
+        {
+          "id": "weight",
+          "title": "Weight (kg)",
+          "type": "Number"
+        }
+      ]
+    }
+  ]
+}
