@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
 from enum import Enum
-from . import Base
+from .base import Base
 
 if TYPE_CHECKING:
     from .teleconsult import Teleconsult

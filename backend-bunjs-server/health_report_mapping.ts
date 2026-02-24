@@ -142,6 +142,14 @@ export const healthReportMapping = [
         'low_writeup': null,
         'high_writeup': null,
       },
+      {
+        'test_code': 'HbA1c',
+        'hl7_code': '4548-4  ^HbA1c^',
+        'lab_range': '4.5-6.4',
+        'float_error': { '.....': '0', '*': '0' },
+        'low_writeup': null,
+        'high_writeup': null,
+      },
     ],
   },
 

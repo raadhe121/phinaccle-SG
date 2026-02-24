@@ -221,6 +221,14 @@ health_report_profiles = [
                 'low_writeup': None,
                 'high_writeup': None,
             },
+            {
+                'test_code': 'HbA1c',
+                'hl7_code': '4548-4  ^HbA1c^',
+                'lab_range': '4.5-6.4',
+                'float_error': { '.....': '0', '*': '0' },
+                'low_writeup': None,
+                'high_writeup': None,
+            },
         ],
     },
 

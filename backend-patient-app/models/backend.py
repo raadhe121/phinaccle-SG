@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-from . import Base
+from .base import Base
 
 class CronLog(Base):
     __tablename__ = "backend_crons"

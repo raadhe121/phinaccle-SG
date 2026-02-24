@@ -5,7 +5,7 @@ from datetime import datetime, date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from .model_enums import DocumentType, FileViewerType, DocumentStatus
-from . import Base
+from .base import Base
 
 if TYPE_CHECKING:
     from .patient import Account

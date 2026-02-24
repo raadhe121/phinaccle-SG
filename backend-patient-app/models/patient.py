@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from .model_enums import FirebaseLoginType, SGiMedICType, SGiMedGender, SGiMedNationality, SGiMedLanguage, SGiMedMaritalStatus, PhoneCountryCode, SGiMedNokRelation
-from . import Base
+from .base import Base
 from .payments import PaymentMethod
 
 if TYPE_CHECKING:

@@ -8,7 +8,7 @@ from sqlalchemy.sql import func
 from config import SGIMED_TELEMED_APPT_TYPE_ID
 from utils import sg_datetime
 
-from . import Base
+from .base import Base
 from .model_enums import CollectionMethod, DocumentType, PatientType, TeleconsultStatus
 from .document import Document
 from .pinnacle import Service

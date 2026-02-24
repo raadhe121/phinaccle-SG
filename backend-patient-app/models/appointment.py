@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 from sqlalchemy.sql import func
 from models.model_enums import AppointmentServiceGroupType, AppointmentStatus, DayOfWeek, AppointmentCategory
 from pydantic import BaseModel
-from . import Base
+from .base import Base
 
 if TYPE_CHECKING:
     from .patient import Account

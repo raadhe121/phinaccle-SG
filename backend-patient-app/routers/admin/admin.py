@@ -61,7 +61,7 @@ def toggle_account_notifications(req: ToggleNotificationsParams, db: Session = D
 
 class BranchResp(BaseModel):
     id: str
-    sgimed_branch_id: str
+    sgimed_branch_id: Optional[str] = None
     name: str
 
 class AccountCreateOptions(BaseModel):

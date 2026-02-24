@@ -3,7 +3,7 @@ from typing import Any, Optional
 from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-from . import Base
+from .base import Base
 
 class HL7Log(Base):
     __tablename__ = "sgimed_hl7_logs"

@@ -5,7 +5,7 @@ from sqlalchemy.sql import func
 
 from models.model_enums import SGiMedICType
 
-from . import Base
+from .base import Base
 
 class CorpAuthorisation(str, Enum):
     BLOCK_EDOCS = "block_edocs"

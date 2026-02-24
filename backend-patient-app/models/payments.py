@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from .model_enums import VisitType
-from . import Base
+from .base import Base
 from .teleconsult import teleconsult_payment_assocs, teleconsult_invoices_assocs
 
 if TYPE_CHECKING:

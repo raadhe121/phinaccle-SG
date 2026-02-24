@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from models.pinnacle import Service
 from .model_enums import WalkinQueueStatus
-from . import Base
+from .base import Base
 from .document import Document
 
 if TYPE_CHECKING:

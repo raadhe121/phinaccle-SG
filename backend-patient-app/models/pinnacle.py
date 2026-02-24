@@ -10,7 +10,7 @@ from utils import sg_datetime
 from utils.time import is_time_in_range
 
 from .model_enums import BranchType, CollectionMethod, ContentCategory, Role
-from . import Base
+from .base import Base
 
 if TYPE_CHECKING:
     from .walkin import WalkInQueue
