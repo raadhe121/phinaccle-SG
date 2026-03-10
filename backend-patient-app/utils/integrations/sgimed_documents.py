@@ -63,7 +63,7 @@ class SGiMedMC(BaseModel):
     id: str
     patient: SGiMedIdName
     is_void: bool
-    visit: SGiMedId
+    visit: SGiMedId | None
     branch_id: str
     last_edited: datetime | None
     created_at: datetime
