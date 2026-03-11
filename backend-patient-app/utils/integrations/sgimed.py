@@ -287,10 +287,14 @@ def log_rate_limits(response: requests.Response):
 class ClientException(Exception):
     pass
 
-# Refresh token flow: exchange SGIMED_API_KEY (refresh token) for short-lived access token
+# Detect if SGIMED_API_KEY is a refresh token or a direct API key
+_is_refresh_token = jwt.decode(SGIMED_API_KEY, options={"verify_signature": False}, algorithms=["ES256"]).get("type") == "OpenApi.refresh"
 token = None
+
 def get_bearer_token() -> str:
     global token
+    if not _is_refresh_token:
+        return SGIMED_API_KEY
     if token:
         decoded_token = jwt.decode(token, options={"verify_signature": False}, algorithms=["ES256"])
         if (datetime.fromtimestamp(decoded_token["exp"]) - datetime.now()).total_seconds() < 1200: # 20 mins
