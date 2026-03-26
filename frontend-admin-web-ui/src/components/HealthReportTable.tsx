@@ -18,7 +18,7 @@ import {
 } from 'antd';
 import { 
   DownloadOutlined, 
-  SearchOutlined, 
+
   InboxOutlined, 
   HistoryOutlined, 
   ThunderboltOutlined, 
@@ -29,7 +29,7 @@ import {
 import type { UploadFile } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
-const { Title, Text } = Typography;
+const {  Text } = Typography;
 const { Dragger } = Upload;
 
 const HealthReportExport: React.FC = () => {
