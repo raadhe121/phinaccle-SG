@@ -2,8 +2,8 @@ import * as Updates from 'expo-updates';
 
 let Config = {
     // development, preview
-    apiUrl: "https://pinnacle-api.geddit-apps.com",
-    // apiUrl: "https://amazed-mink-trivially.ngrok-free.app",
+    // apiUrl: "https://pinnacle-api.geddit-apps.com",
+    apiUrl: "https://amazed-mink-trivially.ngrok-free.app",
     publicToken: "1856bc1b3dfb5fdc409f3e8802370dfc3a00f0beafd6b4cc2edb0e48577a5315",
     stripePublishableKey: "pk_test_51NkM9NCu0dFCVV90qK6HoJbBpvNwvQGN7I6GSsq2o79j0Uub95litmd51IL64YHZLSV4vRMonMgy5EKtBKjuAste00wFy58CoA",
     paymentGateway2C2P: {

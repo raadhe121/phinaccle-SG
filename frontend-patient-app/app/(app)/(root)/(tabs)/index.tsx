@@ -34,7 +34,11 @@ import { ActivityRow } from "../walkin/consultation";
 import { useQuery } from "@tanstack/react-query";
 import React, { useRef } from "react";
 import { useRealtime } from "@/providers/realtime";
-import { Banners, Discover, getBannersApiSupportBannersGet } from "@/services/client";
+import {
+  Banners,
+  Discover,
+  getBannersApiSupportBannersGet,
+} from "@/services/client";
 import { useLaunchActivity } from "@/hooks/useLaunchActivity";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import GenericCarousel from "@/components/home/GenericCarousel";
@@ -42,8 +46,10 @@ import BannerCard from "@/components/home/BannerCard";
 import DiscoverCard from "@/components/home/DiscoverCard";
 
 // TODO: Configure the actual branch IDs for each service centre
-const HEALTH_SCREENING_CENTRE_BRANCH_IDS = ['ca884123-a06c-4514-a8fd-ccd289d34bd6'];
-const IMAGING_CENTRE_BRANCH_IDS = ['b15d33ee-547e-4d9c-81e6-6ed436804b79'];
+const HEALTH_SCREENING_CENTRE_BRANCH_IDS = [
+  "ca884123-a06c-4514-a8fd-ccd289d34bd6",
+];
+const IMAGING_CENTRE_BRANCH_IDS = ["b15d33ee-547e-4d9c-81e6-6ed436804b79"];
 
 // Defaults loaded before query is completed
 const banners: Banners = {
@@ -131,6 +137,15 @@ const showFeatureNotLaunchedDialog = () => {
   });
 };
 
+const showMaintainanceDialog = () => {
+  modal.warn({
+    title: "Maintenance In Progress",
+    content:
+      "This feature is currently under maintenance. Please check back later.",
+    labels: ["OK"],
+    onCancel: () => {},
+  });
+};
 type ServiceItem = {
   title: string;
   icon: any;
@@ -152,11 +167,10 @@ function ServicePage({ items }: { items: ServiceItem[] }) {
             opacity={item.opacity}
           />
         ))}
-        {items.length < 4 && (
+        {items.length < 4 &&
           Array.from({ length: 4 - items.length }).map((_, i) => (
             <View key={`empty-top-${i}`} style={{ flex: 1 }} />
-          ))
-        )}
+          ))}
       </View>
       <View style={{ flexDirection: "row" }}>
         {items.slice(4, 8).map((item, index) => (
@@ -168,11 +182,10 @@ function ServicePage({ items }: { items: ServiceItem[] }) {
             opacity={item.opacity}
           />
         ))}
-        {items.length < 8 && (
+        {items.length < 8 &&
           Array.from({ length: 8 - items.length }).map((_, i) => (
             <View key={`empty-bottom-${i}`} style={{ flex: 1 }} />
-          ))
-        )}
+          ))}
       </View>
     </View>
   );
@@ -247,26 +260,30 @@ function ServicesCarousel({
     {
       title: `Health\nScreening Centre`,
       icon: healthScreeningCentreIcon,
-      onPress: () => router.navigate({
-        pathname: "/appointment",
-        params: { branch_ids: HEALTH_SCREENING_CENTRE_BRANCH_IDS.join(',') }
-      }),
+      onPress: () =>
+        router.navigate({
+          pathname: "/appointment",
+          params: { branch_ids: HEALTH_SCREENING_CENTRE_BRANCH_IDS.join(",") },
+        }),
       opacity: flags.includes("appointment") ? 1.0 : 0.4,
     },
     {
       title: `Imaging\nCentre`,
       icon: imagingCentreIcon,
-      onPress: () => router.navigate({
-        pathname: "/appointment",
-        params: { branch_ids: IMAGING_CENTRE_BRANCH_IDS.join(',') }
-      }),
+      onPress: () =>
+        router.navigate({
+          pathname: "/appointment",
+          params: { branch_ids: IMAGING_CENTRE_BRANCH_IDS.join(",") },
+        }),
       opacity: flags.includes("appointment") ? 1.0 : 0.4,
     },
     {
       title: `Specialist\nCare`,
       icon: specialistIcon,
-      onPress: showFeatureNotLaunchedDialog,
-      opacity: 0.4,
+      // onPress: showFeatureNotLaunchedDialog,
+      onPress: () => router.navigate("/specialist_care/"),
+      // opacity: 0.4,
+      opacity: 1.0,
     },
     // Page 2 - Quick Services
 
@@ -324,7 +341,10 @@ function ServicesCarousel({
         >
           {pages.map((_, index) => {
             // Simple on/off logic: calculate active page with modulo for looping
-            const backgroundColor = (Math.round(scrollProgress) % pages.length === index) ? colors.primary : colors.light;
+            const backgroundColor =
+              Math.round(scrollProgress) % pages.length === index
+                ? colors.primary
+                : colors.light;
 
             return (
               <View
@@ -360,9 +380,9 @@ export default function HomeScreen() {
   >(undefined);
 
   const rq = useQuery({
-    queryKey: ['banners'],
+    queryKey: ["banners"],
     queryFn: getBannersApiSupportBannersGet,
-  })
+  });
 
   return (
     <>
@@ -376,7 +396,7 @@ export default function HomeScreen() {
         </ImageBackground>
 
         <View style={{ height: insets.top }}></View>
-        <View className="my-1 items-center">
+        <View className="items-center my-1">
           <ImageRef src="HeaderLogo" width={150} />
         </View>
 
@@ -530,23 +550,21 @@ const ActivityBanner = () => {
 };
 
 const PinnacleCarousel = () => {
-
-
-//   return (
-//     <GenericCarousel
-//       title=""
-//       items={rq.data ?? []}
-//       loading={rq.isLoading}
-//       itemWidthRatio={1}
-//       itemHeightRatio={0.6}
-//       renderItem={(item, width, height) => (
-//         <CarouselCard
-//           width={width}
-//           height={height}
-//           item={item}
-//           index={rq.data?.indexOf(item) ?? 0}
-//         />
-//       )}
-//     />
-//   );
-}
+  //   return (
+  //     <GenericCarousel
+  //       title=""
+  //       items={rq.data ?? []}
+  //       loading={rq.isLoading}
+  //       itemWidthRatio={1}
+  //       itemHeightRatio={0.6}
+  //       renderItem={(item, width, height) => (
+  //         <CarouselCard
+  //           width={width}
+  //           height={height}
+  //           item={item}
+  //           index={rq.data?.indexOf(item) ?? 0}
+  //         />
+  //       )}
+  //     />
+  //   );
+};
