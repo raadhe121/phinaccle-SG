@@ -7,6 +7,7 @@ from config import ADMIN_WEB_URL, BACKEND_ENVIRONMENT, SENTRY_DSN
 from utils.fastapi import HTTPJSONException
 from routers.realtime import ws_manager
 from routers.admin_health_report_router import router as health_report_router
+from routers.time import router as time_router
 sentry_sdk.init(
     dsn=SENTRY_DSN,
     traces_sample_rate=0.5,
@@ -113,7 +114,7 @@ app.include_router(zone.router, prefix="/api/delivery/pinnacle_zone", tags=["Adm
 # Backend Routers
 app.include_router(webhook_router, prefix="/api/webhook", tags=["Webhooks"])
 app.include_router(crons_router, prefix="/api/crons", tags=["Cron Jobs"])
-
+app.include_router(time_router)
 from routers import render
 app.include_router(render.router, prefix="/api/render", tags=["Render APIs"])
 app.include_router(health_report_router)
