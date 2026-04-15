@@ -83,7 +83,7 @@ def get_yuu_enrollments(
 
     results.data = enrollment_data
     return results
-
+    
 @router.get('/transactions', response_model=Page[YuuTransactionResp])
 def get_yuu_transactions(
     pagination: PaginationInput = Depends(),
