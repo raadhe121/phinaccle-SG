@@ -214,6 +214,13 @@ health_report_profiles = [
                 'high_writeup': '**Your Diabetes control is not optimal.**\nStrict dietary restriction, compliance to medication (if prescribed) and regular exercises are necessary to improve your diabetes control. Sub-optimal diabetes control will lead to development of complications over time e.g. heart diseases, eye diseases, kidney diseases etc. It is recommended that a HbA1C test be repeated in 3 months to assess the control. Introduction or modification of medication may be necessary if the control is still not optimal.',
             },
             {
+                'test_code': 'Random Blood Glucose',
+                'hl7_code': 'RGLU^Random Blood Glucose',
+                'lab_range': '3.6-11.1',
+                'low_writeup': None,
+                'high_writeup': '**Your Diabetes control is not optimal.**\nStrict dietary restriction, compliance to medication (if prescribed) and regular exercises are necessary to improve your diabetes control. Sub-optimal diabetes control will lead to development of complications over time e.g. heart diseases, eye diseases, kidney diseases etc. It is recommended that a HbA1C test be repeated in 3 months to assess the control. Introduction or modification of medication may be necessary if the control is still not optimal.',
+            },
+            {
                 'test_code': 'HbA1c',
                 'hl7_code': '17856-6 ^HbA1c^',
                 'lab_range': '4.5-6.4',
