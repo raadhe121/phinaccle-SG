@@ -6,8 +6,8 @@ uvicorn
 python-dotenv
 psycopg2-binary
 firebase-admin
-python-dotenv
 redis
+cachetools>=5.0.0
 supabase
 pytz
 alembic
