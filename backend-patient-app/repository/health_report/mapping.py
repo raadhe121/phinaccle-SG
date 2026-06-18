@@ -147,7 +147,7 @@ health_report_profiles = [
                 'low_writeup': None,
                 'in_range_writeup': None,
                 'high_writeup': '**Your Blood Pressure is not in the optimal range on the day of your health screening.**\nYou should monitor your blood pressure regularly and start lifestyle modifications as follows:\n(1)    Cut down on your salt intake (less than 2gm of sodium per day i.e. slightly less than a teaspoon of salt per day).\n(2)    Watch your weight (maintain your body mass index between 18.5 to 23).\n(3)    Stop smoking if you do smoke.\n(4)    Start regular exercise (aim for 2.5 hrs of aerobic exercises per week).\n(5)    Learn to cope with stress and to ensure adequate sleep.\n(6)    Reduce your cholesterol level if it is also elevated.\nIf your blood pressure does not reduce with lifestyle changes or if your blood pressure falls in the moderate or severe hypertension groups, you may require medication to control your blood pressure.',
-                'desirable_range_image': 'https://yaadelemrtuxfyxayxpu.supabase.co/storage/v1/object/public/uploads/health_reports/bp_range.png',
+                'desirable_range_image': 'https://yaadelemrtuxfyxayxpu.supabase.co/storage/v1/object/public/uploads/health_reports/bp_range_new_old.png',
                 'desirable_range_image_ratio': 2.06
             },
         ]
