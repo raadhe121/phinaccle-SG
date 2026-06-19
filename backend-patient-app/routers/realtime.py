@@ -45,11 +45,14 @@ class ConnectionManager:
 
     async def send_patient_update(self, id: str):
         if id not in self.activity_connections:
+            logging.warning(f"WS_PATIENT_UPDATE_SKIPPED: No active WS connection for account_id={id}. Update was not delivered (patient app likely not connected/foregrounded).")
             return
 
         try:
             await self.activity_connections[id].send_text("update")
-        except (WebSocketDisconnect, RuntimeError):
+            logging.info(f"WS_PATIENT_UPDATE_SENT: account_id={id}")
+        except (WebSocketDisconnect, RuntimeError) as e:
+            logging.warning(f"WS_PATIENT_UPDATE_FAILED: account_id={id} error={e}. Disconnecting stale connection.")
             self.disconnect_patient_activity(id)
 
     async def send_doctor_update(self, ws: WebSocket, data: dict):
@@ -65,40 +68,58 @@ class ConnectionManager:
             disconnect_func(ws)
 
     async def push_to_channel(self, message: WSMessage):
-        logging.info(f"Publish WS event: {message}")
-        await self.broadcaster.publish(channel=BROADCASTER_CHANNEL, message=message.model_dump_json())
+        import time
+        start = time.time()
+        max_attempts = 2
+        last_error = None
+        for attempt in range(1, max_attempts + 1):
+            try:
+                await self.broadcaster.publish(channel=BROADCASTER_CHANNEL, message=message.model_dump_json())
+                logging.info(f"REDIS_PUBLISH_OK: event={message.event} id={message.id} attempt={attempt} took={time.time()-start:.2f}s")
+                return
+            except Exception as e:
+                last_error = e
+                logging.error(f"REDIS_PUBLISH_ATTEMPT_FAILED: event={message.event} id={message.id} attempt={attempt}/{max_attempts} took={time.time()-start:.2f}s error={e}")
+                if attempt < max_attempts:
+                    await asyncio.sleep(0.3)
+        logging.error(f"REDIS_PUBLISH_FAILED: event={message.event} id={message.id} gave up after {max_attempts} attempts took={time.time()-start:.2f}s error={last_error}")
+        raise last_error
 
     async def listen_to_channel(self, room_id: str):
-        async with self.broadcaster.subscribe(channel=room_id) as subscriber:
-            async for event in subscriber: # type: ignore
-                logging.info(f"Received WS event: {event.message}")
-                msg = WSMessage.model_validate_json(event.message)
-                # continue
-                # Handle Patient Activity Update
-                if msg.id and msg.event == WSEvent.PATIENT_ACTIVITY_UPDATE:
-                    await self.send_patient_update(msg.id)
-                elif msg.event == WSEvent.PATIENT_ACTIVITY_UPDATE_ALL:
-                    for id in list(self.activity_connections.keys()):
-                        await self.send_patient_update(id)
-                elif msg.event == WSEvent.DOCTOR_TELECONSULT_UPDATE_ALL:
-                    for ws in list(self.doctor_connections.keys()):
-                        await self.send_doctor_update(ws, msg.data)
-                elif msg.event == WSEvent.ADMIN_TELECONSULT_UPDATE_ALL:
-                    resp = TeleconsultAdminResp.model_validate(msg.data)
-                    for ws, metadata in list(self.admin_connections.items()):
-                        if metadata["type"] != VisitType.TELECONSULT:
-                            continue
-                        data = {} if sg(resp.checkin_time).date() != metadata["date"] else json.loads(resp.model_dump_json())
-                        await self.send_update(ws, data, self.disconnect_admin)
-                elif msg.event == WSEvent.ADMIN_WALKIN_UPDATE_ALL:
-                    resp = WalkinAdminResp.model_validate(msg.data)
-                    for ws, metadata in list(self.admin_connections.items()):
-                        if metadata["type"] != VisitType.WALKIN:
-                            continue
-                        data = {} if sg(resp.created_at).date() != metadata["date"] else json.loads(resp.model_dump_json())
-                        await self.send_update(ws, data, self.disconnect_admin)
-                else:
-                    logging.error(f"Unknown event: {event.message}")
+        try:
+            async with self.broadcaster.subscribe(channel=room_id) as subscriber:
+                logging.warning(f"REDIS_SUBSCRIBER: Subscribed to channel '{room_id}'.")
+                async for event in subscriber: # type: ignore
+                    msg = WSMessage.model_validate_json(event.message)
+                    logging.info(f"Received WS event: event={msg.event} id={msg.id}")
+                    # Handle Patient Activity Update
+                    if msg.id and msg.event == WSEvent.PATIENT_ACTIVITY_UPDATE:
+                        await self.send_patient_update(msg.id)
+                    elif msg.event == WSEvent.PATIENT_ACTIVITY_UPDATE_ALL:
+                        for id in list(self.activity_connections.keys()):
+                            await self.send_patient_update(id)
+                    elif msg.event == WSEvent.DOCTOR_TELECONSULT_UPDATE_ALL:
+                        for ws in list(self.doctor_connections.keys()):
+                            await self.send_doctor_update(ws, msg.data)
+                    elif msg.event == WSEvent.ADMIN_TELECONSULT_UPDATE_ALL:
+                        resp = TeleconsultAdminResp.model_validate(msg.data)
+                        for ws, metadata in list(self.admin_connections.items()):
+                            if metadata["type"] != VisitType.TELECONSULT:
+                                continue
+                            data = {} if sg(resp.checkin_time).date() != metadata["date"] else json.loads(resp.model_dump_json())
+                            await self.send_update(ws, data, self.disconnect_admin)
+                    elif msg.event == WSEvent.ADMIN_WALKIN_UPDATE_ALL:
+                        resp = WalkinAdminResp.model_validate(msg.data)
+                        for ws, metadata in list(self.admin_connections.items()):
+                            if metadata["type"] != VisitType.WALKIN:
+                                continue
+                            data = {} if sg(resp.created_at).date() != metadata["date"] else json.loads(resp.model_dump_json())
+                            await self.send_update(ws, data, self.disconnect_admin)
+                    else:
+                        logging.error(f"Unknown event: {event.message}")
+            logging.error(f"REDIS_SUBSCRIBER: Subscription loop on channel '{room_id}' exited unexpectedly (connection likely dropped).")
+        except Exception as e:
+            logging.error(f"REDIS_SUBSCRIBER: Subscription to channel '{room_id}' failed/disconnected: {e}")
 
     async def connect_patient_activity(self, id: str, ws: WebSocket):
         await ws.accept()
