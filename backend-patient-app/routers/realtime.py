@@ -112,16 +112,17 @@ class ConnectionManager:
                 logging.error(f"REDIS_RECONNECT: connect failed: {e}")
 
     async def send_patient_update(self, id: str):
-        if id not in self.activity_connections:
+        ws = self.activity_connections.get(id)
+        if ws is None:
             logging.warning(f"WS_PATIENT_UPDATE_SKIPPED: No active WS connection for account_id={id}. Update was not delivered (patient app likely not connected/foregrounded).")
             return
 
         try:
-            await self.activity_connections[id].send_text("update")
+            await ws.send_text("update")
             logging.info(f"WS_PATIENT_UPDATE_SENT: account_id={id}")
         except (WebSocketDisconnect, RuntimeError) as e:
             logging.warning(f"WS_PATIENT_UPDATE_FAILED: account_id={id} error={e}. Disconnecting stale connection.")
-            self.disconnect_patient_activity(id)
+            self.disconnect_patient_activity(id, ws)
 
     async def send_doctor_update(self, ws: WebSocket, data: dict):
         try:
@@ -199,11 +200,20 @@ class ConnectionManager:
         await ws.accept()
         self.activity_connections[id] = ws
 
-    def disconnect_patient_activity(self, id: str):
-        try:
-            del self.activity_connections[id]
-        except KeyError:
+    def disconnect_patient_activity(self, id: str, ws: Optional[WebSocket] = None):
+        # Only evict if the stored socket is the one being torn down. Patient
+        # connections are keyed by account id, so a quick reconnect overwrites
+        # activity_connections[id] with the new socket; without this guard the old
+        # socket's delayed teardown would delete the new (live) entry and silently
+        # make the patient unreachable for all future updates.
+        current = self.activity_connections.get(id)
+        if current is None:
             logging.warning(f"WS Patient Connection not found. User ID: {id}")
+            return
+        if ws is not None and current is not ws:
+            logging.info(f"WS_PATIENT_DISCONNECT_SKIPPED: stale socket for account_id={id}; keeping newer connection.")
+            return
+        del self.activity_connections[id]
 
     async def connect_doctor(self, ws: WebSocket, id: str):
         await ws.accept()

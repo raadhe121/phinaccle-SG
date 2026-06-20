@@ -52,6 +52,7 @@ async def activity_websocket(id: str, websocket: WebSocket):
             except asyncio.TimeoutError:
                 pass
     except WebSocketDisconnect:
-        ws_manager.disconnect_patient_activity(str(user.id))
+        ws_manager.disconnect_patient_activity(str(user.id), websocket)
     except RuntimeError:
         logging.warning(f'RuntimeError: Patient WS State {websocket.application_state}')
+        ws_manager.disconnect_patient_activity(str(user.id), websocket)

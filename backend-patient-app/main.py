@@ -1,9 +1,21 @@
 from contextlib import asynccontextmanager
+import logging
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import sentry_sdk
 from config import ADMIN_WEB_URL, BACKEND_ENVIRONMENT, SENTRY_DSN
+
+# Without this the root logger sits at the default WARNING level, so all the
+# logging.info() diagnostics (REDIS_PUBLISH_OK, "Received WS event",
+# WS_PATIENT_UPDATE_SENT, ...) are silently dropped and the realtime success path
+# is invisible. Default to INFO; override with LOG_LEVEL=WARNING to quieten.
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    force=True,
+)
 from utils.fastapi import HTTPJSONException
 from routers.realtime import ws_manager
 from routers.admin_health_report_router import router as health_report_router
