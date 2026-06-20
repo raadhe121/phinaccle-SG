@@ -6,7 +6,11 @@ uvicorn
 python-dotenv
 psycopg2-binary
 firebase-admin==7.4.0
-redis==8.0.0
+# Pinned to 5.x: broadcaster==0.3.1's async pub/sub listener (pubsub.listen())
+# is incompatible with redis-py 8.0.0 — SUBSCRIBE succeeds but listen() never
+# yields, so realtime WS delivery silently stops. Do not bump without verifying
+# broadcaster pub/sub still delivers (see /api/render/realtime_debug).
+redis==5.2.1
 cachetools>=5.0.0
 supabase==2.28.0
 pytz
