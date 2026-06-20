@@ -99,6 +99,14 @@ class ConnectionManager:
         Re-establish the shared broadcaster connection so a Redis restart / internal
         IP change is picked up. broadcaster caches its connection on connect() and
         does not re-resolve on its own.
+
+        MUST only be called from _supervise_subscription(), i.e. AFTER
+        listen_to_channel() has returned and the `async with broadcaster.subscribe(...)`
+        block has exited (which issues UNSUBSCRIBE and drops the subscriber queue).
+        disconnect() here cancels the backend pubsub listener and the Broadcast queue
+        pump, so calling it while a subscriber is live inside subscribe() would
+        permanently kill realtime delivery without re-subscribing. Do NOT call from
+        the publish path.
         '''
         async with self._reconnect_lock:
             try:
@@ -154,8 +162,19 @@ class ConnectionManager:
                 last_error = e
                 logging.error(f"REDIS_PUBLISH_ATTEMPT_FAILED: event={message.event} id={message.id} attempt={attempt}/{max_attempts} took={time.time()-start:.2f}s error={e}")
                 if attempt < max_attempts:
-                    # The connection is likely stale/half-open; refresh it before retrying.
-                    await self._reconnect_broadcaster()
+                    # Deliberately do NOT reconnect the broadcaster here. publish and
+                    # subscribe share a single Broadcast()/RedisBackend instance, and
+                    # broadcaster.disconnect() tears down the pubsub connection, cancels
+                    # the backend _pubsub_listener and the Broadcast._listener task, and
+                    # loses redis-py's channel-subscription state. The live subscriber is
+                    # parked inside `async with broadcaster.subscribe(...)` blocked on an
+                    # asyncio.Queue.get(); a reconnect from the publish path silently and
+                    # permanently kills it (the subscribe context never re-issues
+                    # SUBSCRIBE, so no events ever arrive again, and listen_to_channel
+                    # never returns so the supervisor while-loop never re-enters).
+                    # Connection lifecycle is owned solely by _supervise_subscription().
+                    # Here we just back off and retry; the publish connection (_conn) is
+                    # the command connection and redis-py reconnects it on the next call.
                     await asyncio.sleep(0.3)
         logging.error(f"REDIS_PUBLISH_FAILED: event={message.event} id={message.id} gave up after {max_attempts} attempts took={time.time()-start:.2f}s error={last_error}")
         raise last_error
