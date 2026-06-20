@@ -40,11 +40,76 @@ class ConnectionManager:
         self.activity_connections: dict[str, WebSocket] = {}
         self.doctor_connections: dict[WebSocket, dict] = {}
         self.admin_connections: dict[WebSocket, dict] = {}
+        # Strong reference to the supervised subscriber task. asyncio only keeps a
+        # weak reference to tasks, so without this the listener could be garbage
+        # collected mid-execution.
+        self._listener_task: Optional[asyncio.Task] = None
+        # Serializes broadcaster reconnects so the publish path and the subscriber
+        # supervisor don't tear the connection down on top of each other.
+        self._reconnect_lock = asyncio.Lock()
 
     async def listen(self):
-        subscribe_n_listen_task = asyncio.create_task(self.listen_to_channel(room_id=BROADCASTER_CHANNEL))
-        wait_for_subscribe_task = asyncio.create_task(asyncio.sleep(1))  # 1 Second delay
-        await asyncio.wait([subscribe_n_listen_task, wait_for_subscribe_task], return_when=asyncio.FIRST_COMPLETED)
+        # Start the subscriber as a long-lived, self-healing background task.
+        if self._listener_task and not self._listener_task.done():
+            return
+        self._listener_task = asyncio.create_task(self._supervise_subscription())
+
+    async def stop_listening(self):
+        if self._listener_task and not self._listener_task.done():
+            self._listener_task.cancel()
+            try:
+                await self._listener_task
+            except asyncio.CancelledError:
+                pass
+        self._listener_task = None
+
+    async def _supervise_subscription(self):
+        '''
+        Keep a Redis subscription alive forever. The subscribe loop ends whenever
+        the Redis connection drops (idle disconnect, restart, network blip); on its
+        own it would never come back, silently killing all realtime delivery. This
+        supervisor re-establishes the connection and re-subscribes with backoff.
+        '''
+        import time
+        backoff = 1
+        MAX_BACKOFF = 30
+        while True:
+            started = time.time()
+            try:
+                await self.listen_to_channel(room_id=BROADCASTER_CHANNEL)
+            except asyncio.CancelledError:
+                logging.warning("REDIS_SUBSCRIBER: supervisor cancelled; stopping.")
+                raise
+            except Exception as e:
+                logging.error(f"REDIS_SUBSCRIBER: listen loop crashed: {e}")
+            else:
+                logging.error("REDIS_SUBSCRIBER: listen loop returned (connection dropped).")
+
+            # Reset backoff if the subscription stayed healthy for a while.
+            if time.time() - started > 60:
+                backoff = 1
+
+            await self._reconnect_broadcaster()
+            logging.warning(f"REDIS_SUBSCRIBER: re-subscribing in {backoff}s")
+            await asyncio.sleep(backoff)
+            backoff = min(backoff * 2, MAX_BACKOFF)
+
+    async def _reconnect_broadcaster(self):
+        '''
+        Re-establish the shared broadcaster connection so a Redis restart / internal
+        IP change is picked up. broadcaster caches its connection on connect() and
+        does not re-resolve on its own.
+        '''
+        async with self._reconnect_lock:
+            try:
+                await self.broadcaster.disconnect()
+            except Exception as e:
+                logging.warning(f"REDIS_RECONNECT: disconnect failed (ignored): {e}")
+            try:
+                await self.broadcaster.connect()
+                logging.warning("REDIS_RECONNECT: broadcaster reconnected.")
+            except Exception as e:
+                logging.error(f"REDIS_RECONNECT: connect failed: {e}")
 
     async def send_patient_update(self, id: str):
         if id not in self.activity_connections:
@@ -73,17 +138,23 @@ class ConnectionManager:
     async def push_to_channel(self, message: WSMessage):
         import time
         start = time.time()
-        max_attempts = 2
+        max_attempts = 3
+        PUBLISH_TIMEOUT = 5  # seconds; never let a stale connection hang the publish
         last_error = None
         for attempt in range(1, max_attempts + 1):
             try:
-                await self.broadcaster.publish(channel=BROADCASTER_CHANNEL, message=message.model_dump_json())
+                await asyncio.wait_for(
+                    self.broadcaster.publish(channel=BROADCASTER_CHANNEL, message=message.model_dump_json()),
+                    timeout=PUBLISH_TIMEOUT,
+                )
                 logging.info(f"REDIS_PUBLISH_OK: event={message.event} id={message.id} attempt={attempt} took={time.time()-start:.2f}s")
                 return
             except Exception as e:
                 last_error = e
                 logging.error(f"REDIS_PUBLISH_ATTEMPT_FAILED: event={message.event} id={message.id} attempt={attempt}/{max_attempts} took={time.time()-start:.2f}s error={e}")
                 if attempt < max_attempts:
+                    # The connection is likely stale/half-open; refresh it before retrying.
+                    await self._reconnect_broadcaster()
                     await asyncio.sleep(0.3)
         logging.error(f"REDIS_PUBLISH_FAILED: event={message.event} id={message.id} gave up after {max_attempts} attempts took={time.time()-start:.2f}s error={last_error}")
         raise last_error
