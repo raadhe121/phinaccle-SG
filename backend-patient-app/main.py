@@ -24,6 +24,7 @@ async def lifespan(app: FastAPI):
     # Shutdown executors before disconnecting broadcaster
     from utils.executors import shutdown_executors
     shutdown_executors()
+    await ws_manager.stop_listening()
     await ws_manager.broadcaster.disconnect()
 
 # Disable Docs in Production Environment
