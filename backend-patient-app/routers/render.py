@@ -1,11 +1,21 @@
 import json
 import socket
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from config import CRON_API_KEY
 from models import get_db, active_db_conn
 from models.pinnacle import Content
 from utils.fastapi import SuccessResp
 
 router = APIRouter()
+
+# Gate the standing diagnostic endpoint behind an existing operational secret.
+# HTTPBearer() returns 403 when the Authorization header is missing/malformed;
+# the explicit check returns 403 on a wrong token value.
+auth_scheme = HTTPBearer()
+def validate_debug_token(token: HTTPAuthorizationCredentials = Depends(auth_scheme)):
+    if token.credentials != CRON_API_KEY:
+        raise HTTPException(status_code=403, detail="Invalid token")
 
 @router.get('/health', response_model=SuccessResp)
 def health_check(db = Depends(get_db)):
@@ -18,7 +28,7 @@ def db_conns():
     return active_db_conn
 
 @router.get('/realtime_debug')
-def realtime_debug(publish: bool = False):
+def realtime_debug(publish: bool = False, _auth = Depends(validate_debug_token)):
     '''
     Observability for the realtime pub/sub pipeline.
 
