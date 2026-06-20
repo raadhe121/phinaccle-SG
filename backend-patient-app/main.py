@@ -145,10 +145,19 @@ app.add_middleware(
 )
 
 # uvicorn main:app --reload --host 0.0.0.0 --port 8000
+# ws_ping_interval/ws_ping_timeout: server sends protocol-level WebSocket PING
+# frames every 8s so otherwise-idle sockets stay alive past intermediate idle
+# timeouts (the ~10-20s reconnect churn). PING/PONG are transport-layer control
+# frames the browser/React Native answer automatically WITHOUT firing onmessage,
+# so this needs zero client change and cannot trigger client refetches. The 30s
+# pong timeout is generous so a backgrounded/slow mobile client is not falsely
+# force-closed.
 if __name__ == '__main__':
     import uvicorn
     if IS_DEV:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=1)
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=1,
+                    ws_ping_interval=8, ws_ping_timeout=30)
     else:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False, workers=2)
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False, workers=2,
+                    ws_ping_interval=8, ws_ping_timeout=30)
     
