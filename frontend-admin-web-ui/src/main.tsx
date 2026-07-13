@@ -53,7 +53,7 @@ import LandingPage from './pages/landing/index.tsx'
 import { YuuScreen } from './pages/yuu'
 import BranchOperatingHours from './pages/branches/operating-hours.tsx'
 import BranchAppointmentHours from './pages/branches/appointment-hours.tsx'
-
+import HealthReportTable from './components/HealthReportTable.tsx'
 OpenAPI.BASE = import.meta.env.VITE_ADMIN_API_URL;
 OpenAPI.TOKEN = async () => {
     const { data, error } = await supabase.auth.getSession()
@@ -161,6 +161,7 @@ function AdminApp() {
                 <Route path="/reports" element={<ScreenLayout />}>
                     <Route path="reconciliation" element={<ReconciliationScreen />} />
                     <Route path="health-reports" element={<HealthReportsScreen />} />
+                     <Route path="export-health-reports" element={<HealthReportTable />} />
                 </Route>
                 <Route path="/yuu" element={<ScreenLayout />}>
                     <Route index element={<YuuScreen />} />

@@ -68,7 +68,7 @@ export const healthReportMapping = [
         'low_writeup': null,
         'in_range_writeup': null,
         'high_writeup': '**Your Blood Pressure is not in the optimal range on the day of your health screening.**\nYou should monitor your blood pressure regularly and start lifestyle modifications as follows:\n(1)    Cut down on your salt intake (less than 2gm of sodium per day i.e. slightly less than a teaspoon of salt per day).\n(2)    Watch your weight (maintain your body mass index between 18.5 to 23).\n(3)    Stop smoking if you do smoke.\n(4)    Start regular exercise (aim for 2.5 hrs of aerobic exercises per week).\n(5)    Learn to cope with stress and to ensure adequate sleep.\n(6)    Reduce your cholesterol level if it is also elevated.\nIf your blood pressure does not reduce with lifestyle changes or if your blood pressure falls in the moderate or severe hypertension groups, you may require medication to control your blood pressure.',
-        'desirable_range_image': 'https://yaadelemrtuxfyxayxpu.supabase.co/storage/v1/object/public/uploads/health_reports/bp_range.png',
+        'desirable_range_image': 'https://yaadelemrtuxfyxayxpu.supabase.co/storage/v1/object/public/uploads/health_reports/bp_range_new_old.png',
         'desirable_range_image_ratio': 2.06
       },
     ]
@@ -82,7 +82,6 @@ export const healthReportMapping = [
       {
         'test_code': 'Total Cholesterol',
         'hl7_code': '14647-2 ^Total Cholesterol^',
-        // [('Total Cholesterol', frow['Total Cholesterol'] > 5.1)],
         'lab_range': '< 5.2',
         'low_writeup': null,
         'high_writeup': '**Your Total Cholesterol level is high.**\nIncreased cholesterol may be the result of excess intake of cholesterol-laden foods. Prolonged hypercholesterolaemia results in progressive atherosclerosis where the blood vessels become narrowed and may become blocked causing stroke and heart attacks.',
@@ -90,7 +89,6 @@ export const healthReportMapping = [
       {
         'test_code': 'HDL Cholesterol',
         'hl7_code': '14646-4 ^HDL-Cholesterol^',
-        // [('HDL', frow['HDL-Cholesterol'] < 1)],
         'lab_range': '> 1.0',
         'low_writeup': '**Your HDL-Cholesterol level is low.**\nThis "good" cholesterol protects against atherosclerosis. It does so by removing cholesterol from our cells and transporting it to the liver for removal. You could raise it by ceasing to smoke (if you smoke), exercising regularly, and losing excess weight (if overweight). Pre-menopausal women typically have higher levels because of hormonal influence. You should have your lipid profile checked regularly.',
       },
@@ -104,17 +102,14 @@ export const healthReportMapping = [
       {
         'test_code': 'LDL Cholesterol',
         'hl7_code': '39469-2 ^LDL-Cholesterol^',
-        // [('LDL', frow['LDL-Cholesterol'] > 3.3)],
         'lab_range': '< 3.4',
         'float_error': { '*': '3.41' },
         'low_writeup': null,
         'high_writeup': '**Your LDL-Cholesterol level is high.**\nProlonged LDL-Hypercholesterolaemia results in progressive atherosclerosis where the blood vessels become narrowed and blocked causing possible stroke and heart attacks.',
       },
-
       {
         'test_code': 'Triglycerides',
         'hl7_code': 'TG^Triglycerides',
-        // [('Triglycerides', frow['Triglycerides'] > 2.2)],
         'lab_range': '< 2.3',
         'low_writeup': null,
         'high_writeup': '**Your Triglyceride level is high.**\nYou should avoid oily, fatty, and fried food. Sugars and starches are high in caloric content and should also be curtailed. If you drink alcohol, this should be moderated. Regular graded exercises would be helpful especially if you are above your recommended body weight. Persistent hypertriglyceridemia increases the risk of vascular disease and medication is necessary if dietary curtailment is ineffective in reducing levels. Your triglyceride level should be tested on regular intervals.',
@@ -123,6 +118,7 @@ export const healthReportMapping = [
   },
 
   // Diabetic Mellitus Profile
+  // FIXED: Added 'Glucose' (Random Blood Glucose) entry which was missing from TS but present in mapping.py
   {
     'profile': Profiles.DIABETIC,
     'description': 'A haemoglobin A1C (HbA1C) test is a blood test that shows what your average blood sugar level was over the past two to three months.',
@@ -275,6 +271,7 @@ export const healthReportMapping = [
   },
 
   // Bone & Joint Profile
+  // FIXED: Added 'Calcium' and 'Uric Acid' entries which were missing from TS but present in mapping.py
   {
     'profile': Profiles.BONE_JOINT,
     'description': 'A bone profile blood test, also known as a bone metabolism test or a bone turnover marker test, is a diagnostic tool used to assess various aspects of bone health and function. It is most often used to diagnose early signs of bone loss or osteoporosis.',
@@ -297,7 +294,6 @@ export const healthReportMapping = [
         'test_code': 'Uric Acid',
         'hl7_code': '14933-6 ^Uric Acid^',
         'lab_range': { 'M': '220-547', 'F': '184-464' },
-        // 'lab_range': '184-464',
         'low_writeup': null,
         'high_writeup': '**Your Uric Acid is elevated.**\nHigh uric acid will increase your risk of developing gout where you only experience joint pain during gout attack or kidney stone disease. High uric acid may be due to a variety or combination of factors such as excess dietary intake, increased synthesis by the body (implying a genetic influence), reduced kidney excretion or drug exposure. You should reduce the intake of purine rich food such as shellfish (e.g. lobster, oysters, crayfish), internal organs (e.g. liver, entrails), ikan bilis, sardines and red meat (e.g. beef and mutton). Alcohol (e.g. beer, spirits and wine) should also be avoided. Beans, nuts, and related foods are rich in vegetable protein and intake should also be moderated. Daily fluid intake of 2 litres is recommended. Medication may be needed if you are symptomatic with evidence of kidney stone or gouty arthritis.',
       },
@@ -334,7 +330,6 @@ export const healthReportMapping = [
       {
         'test_code': 'Haemoglobin',
         'hl7_code': '718-7   ^Haemoglobin^',
-        // 'lab_range': { 'M': '13.5-18.0', 'F': '11.5-16.0' },
         'lab_range': '11.5-16.0',
         'float_error': { '*': '0' },
         'low_writeup': '**Your Haemoglobin level is low.**\n Anaemia may be due to a variety or combination of reasons. Commonly, it is due to a lack of blood forming elements like iron and folic acid. Diagnostic tests are available to detect common dietary deficiencies. Dietary supplements may be required in these cases. Anaemia can also be due to hereditary reasons, e.g. Thalassaemia. This means that you may have certain genes that cause production of defective haemoglobin. Individuals with such inherited anaemias are usually asymptomatic and well although they may transmit the condition to their offspring. Haemoglobin electrophoresis will be useful as screening test.',
@@ -357,7 +352,6 @@ export const healthReportMapping = [
       {
         'test_code': 'ESR',
         'hl7_code': '30341-2 ^ESR^',
-        // 'lab_range': { 'M': '0-10', 'F': '0-20' },
         'lab_range': '0-20',
         'float_error': { '*': '0' },
         'low_writeup': null,
@@ -368,6 +362,7 @@ export const healthReportMapping = [
   },
 
   // Thyroid Function Test
+  // FIXED: Added 'Free T4' entry which was missing from TS but present in mapping.py
   {
     'profile': Profiles.THYROID,
     'description': 'A Thyroid function test (TFT) commonly refers to the quantitation of thyroid stimulating hormone (TSH) and circulating thyroid hormones in serum to assess the ability of the thyroid gland to produce and regulate thyroid hormone production. It is used to diagnose hyperthyroidism (too much thyroid hormone) or hypothyroidism (too little thyroid hormone) in your blood.',
@@ -397,7 +392,7 @@ export const healthReportMapping = [
     'profile': Profiles.HEPATITIS,
     'description': 'Hepatitis is an inflammation of the liver caused by a virus. The hepatitis profile includes tests for hepatitis B and hepatitis C.',
     'tests': [
-      // # TODO: Missing Hepatitis HL7 codes
+      // TODO: Missing Hepatitis HL7 codes
       // {
       //     'test_code': 'Hepatitis Bs Antigen',
       //     'hl7_code': null,
@@ -408,7 +403,7 @@ export const healthReportMapping = [
       // {
       //     'test_code': 'Hepatitis Bs Antibody',
       //     'hl7_code': null,
-      //     'lab_range': '10-??', # TODO: This require three ranges out_of_range, in_range (low, normal)
+      //     'lab_range': '10-??',
       //     'negative_writeup': '**You are not protected against Hepatitis B infection.**\nHepatitis B is an infection of the liver by a virus that is transmitted through contact with infected body fluids such as during delivery, via unprotected sex, accidental needle prick injuries or transfusion with contaminated blood products. Immunisation with hepatitis B vaccine is available. The primary immunisation consists of 3 injections of vaccines over a 6-month period. Boosters are then required about once every 5 to 10 years to maintain adequate immunity.',
       //     'low_writeup': '**You are protected against Hepatitis B infection, but your immunity level is low.**\nHepatitis B is an infection of the liver by a virus that is transmitted through contact with infected body fluids such as during delivery, via unprotected sex, accidental needle prick injuries or transfusion with contaminated blood products. An antibody level above 10 is protective against hepatitis B infection. Your antibody level is adequate, but the level can be boosted with a booster vaccination to increase the duration of its protection.',
       //     'positive_writeup': '**You are protected against Hepatitis B infection.**\nThere is immunity agaisnt Hepatitis B and no further action is needed.',
@@ -459,7 +454,7 @@ export const healthReportMapping = [
       // {
       //     'test_code': 'Apolipoprotein A1/B Ratio',
       //     'hl7_code': '13462-7 ^Apo A1/Apo B Ratio^',
-      //     'lab_range': null, # TODO: Missing Apo A1/B Ratio
+      //     'lab_range': null,
       //     'low_writeup': null,
       //     'high_writeup': '**Your Apolipoprotein B/Apolipoprotein A1 Ratio is high.**\nThe ApoB/ApoA1 ratio is a valuable marker in cardiovascular risk assessment. It compares atherogenic (plaque-forming) lipoproteins (ApoB) to anti-atherogenic (protective) lipoproteins (ApoA1). High Apolipoprotein B/Apolipoprotein A1 Ratio (ApoB/ApoA1) maybe due to obesity, metabolic syndrome, diabetes, smoking, excessive alcohol consumption, sedentary lifestyle. Please consult the doctor for further instructions.',
       // }
@@ -537,7 +532,7 @@ export const healthReportMapping = [
       },
       // {
       //     'test_code': 'TPHA',
-      //     'hl7_code': null, # TODO: Missing TPHA HL7 code
+      //     'hl7_code': null,
       //     'lab_range': null,
       //     'negative_writeup': '**False positive VDRL result was noted.**\nYour VDRL serology for screening of syphilis was positive but confirmatory TPHA serology was negative. This means that you have a false positive result. Acute or chronic infections by other organisms as well as some chronic inflammatory disease states may cause a false positive VDRL result.',
       //     'positive_writeup': '**VDRL and TPHA tests for the screening of syphilis were positive in your blood investigations.**\nSpecialist referral and follow up is necessary for the management of syphilis.',
@@ -678,10 +673,10 @@ export const healthReportMapping = [
         'negative_writeup': null,
         'positive_writeup': '**Presence of Crystals.**\nSmall amounts of crystals may be found in some individuals depending on the acidity of their urine. Excess crystals and for prolonged periods may precipitate stone formation. You are advised to repeat a midstream sampling after adequate hydration. Daily fluid intake should be about 2 litres.',
       },
-      // # TODO: The earlier test code was wrong
+      // TODO: The earlier test code was wrong
       // {
       //     'test_code': 'Urine Microalbumin/Creatinine Ratio',
-      //     'hl7_code': '', TODO: # xxxx^Microalbumin/Creatinine present but no values
+      //     'hl7_code': '',
       //     'positive_writeup': '**Your Urine Microalbumin / Creatinine Ratio is High.**\nThe urine microalbumin-to-creatinine ratio (UACR) is a commonly used to detect early kidney damage, particularly in people at risk for chronic kidney disease (CKD), such as those with diabetes, hypertension, or cardiovascular disease. Please consult the doctor for further advice.',
       // }
     ],

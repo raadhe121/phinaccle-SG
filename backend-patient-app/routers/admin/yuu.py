@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_,cast, DateTime 
 from typing import Optional
 from datetime import date, datetime, timedelta
 from pydantic import BaseModel
@@ -41,6 +41,8 @@ class YuuTransactionResp(BaseModel):
 def get_yuu_enrollments(
     pagination: PaginationInput = Depends(),
     search: Optional[str] = Query(None),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
     query = db.query(
@@ -50,18 +52,25 @@ def get_yuu_enrollments(
         Account.name,
         Account.nric
     ).join(Account).filter(AccountYuuLink.deleted == False)
+
     if search:
         query = query.filter(or_(
             Account.name.ilike(f'%{search}%'),
             Account.nric.ilike(f'%{search}%'),
             AccountYuuLink.tomo_id.ilike(f'%{search}%')
         ))
+
+    # FIXED: Explicitly cast strings to DateTime so PostgreSQL understands the comparison
+    if start_date:
+        query = query.filter(AccountYuuLink.linked_at >= cast(f"{start_date} 00:00:00", DateTime))
+    if end_date:
+        query = query.filter(AccountYuuLink.linked_at <= cast(f"{end_date} 23:59:59", DateTime))
+
     query = query.order_by(AccountYuuLink.linked_at.desc())
 
-    # Transform the results to match the response model
+    # The rest of your function remains the same
     results = paginate(query, db, pagination)
 
-    # Convert to response format
     enrollment_data = []
     for row in results.data:
         enrollment_data.append(YuuEnrollmentResp(
@@ -74,7 +83,7 @@ def get_yuu_enrollments(
 
     results.data = enrollment_data
     return results
-
+    
 @router.get('/transactions', response_model=Page[YuuTransactionResp])
 def get_yuu_transactions(
     pagination: PaginationInput = Depends(),

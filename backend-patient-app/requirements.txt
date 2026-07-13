@@ -5,13 +5,16 @@ fastapi
 uvicorn
 python-dotenv
 psycopg2-binary
-firebase-admin
-python-dotenv
-redis
-supabase
+firebase-admin==7.4.0
+# Pinned to 5.x: broadcaster==0.3.1's async pub/sub listener (pubsub.listen())
+# is incompatible with redis-py 8.0.0 — SUBSCRIBE succeeds but listen() never
+# yields, so realtime WS delivery silently stops. Do not bump without verifying
+# broadcaster pub/sub still delivers (see /api/render/realtime_debug).
+redis==5.2.1
+cachetools>=5.0.0
+supabase==2.28.0
 pytz
 alembic
-realtime
 exponent_server_sdk
 stripe
 sse_starlette
@@ -19,7 +22,7 @@ pyjwt
 pyfa_converter_v2
 websockets
 openpyxl
-sentry-sdk
+sentry-sdk==2.63.0
 sentry-sdk[fastapi]
 sentry-sdk[sqlalchemy]
 apscheduler
@@ -28,9 +31,9 @@ csvkit
 alembic-postgresql-enum
 pandas
 pandas[excel]
-broadcaster
+broadcaster==0.3.1
 broadcaster[redis]
-httpx
+httpx==0.28.1
 tenacity
 pyppeteer
 hl7apy
@@ -42,3 +45,4 @@ pypdf
 jwcrypto
 boto3
 resend==2.16.0
+XlsxWriter

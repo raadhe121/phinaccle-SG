@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthProvider';
 import { ConfigProvider, Layout, Menu, MenuProps, Tag, Typography, theme } from 'antd';
 import PinnacleLogo from '../assets/pinnacle-logo.png'
-import { DatabaseOutlined, LogoutOutlined, UserOutlined, EnvironmentOutlined, CalendarOutlined, FileUnknownOutlined, SyncOutlined, VideoCameraOutlined, UsergroupAddOutlined, DollarOutlined, NotificationOutlined, FileTextOutlined, DeliveredProcedureOutlined, GiftOutlined } from '@ant-design/icons';
+import { DatabaseOutlined, LogoutOutlined, UserOutlined, EnvironmentOutlined, CalendarOutlined, FileUnknownOutlined, SyncOutlined, VideoCameraOutlined, UsergroupAddOutlined, DollarOutlined, NotificationOutlined, FileTextOutlined, DeliveredProcedureOutlined, GiftOutlined,HistoryOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RoleTag } from './RoleTag';
 
@@ -55,6 +55,7 @@ const Sidebar = () => {
                 children: [
                     { key: '/reports/reconciliation', label: 'Reconciliation', icon: <DollarOutlined />}, 
                     { key: '/reports/health-reports', label: 'Health Reports', icon: <FileTextOutlined />}, 
+                       { key: '/reports/export-health-reports', label: 'Export Health Reports', icon: <HistoryOutlined />}, 
                 ],
             },
             {

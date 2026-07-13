@@ -1,12 +1,25 @@
 from contextlib import asynccontextmanager
+import logging
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import sentry_sdk
 from config import ADMIN_WEB_URL, BACKEND_ENVIRONMENT, SENTRY_DSN
+
+# Without this the root logger sits at the default WARNING level, so all the
+# logging.info() diagnostics (REDIS_PUBLISH_OK, "Received WS event",
+# WS_PATIENT_UPDATE_SENT, ...) are silently dropped and the realtime success path
+# is invisible. Default to INFO; override with LOG_LEVEL=WARNING to quieten.
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    force=True,
+)
 from utils.fastapi import HTTPJSONException
 from routers.realtime import ws_manager
-
+from routers.admin_health_report_router import router as health_report_router
+from routers.time import router as time_router
 sentry_sdk.init(
     dsn=SENTRY_DSN,
     traces_sample_rate=0.5,
@@ -23,6 +36,7 @@ async def lifespan(app: FastAPI):
     # Shutdown executors before disconnecting broadcaster
     from utils.executors import shutdown_executors
     shutdown_executors()
+    await ws_manager.stop_listening()
     await ws_manager.broadcaster.disconnect()
 
 # Disable Docs in Production Environment
@@ -113,10 +127,10 @@ app.include_router(zone.router, prefix="/api/delivery/pinnacle_zone", tags=["Adm
 # Backend Routers
 app.include_router(webhook_router, prefix="/api/webhook", tags=["Webhooks"])
 app.include_router(crons_router, prefix="/api/crons", tags=["Cron Jobs"])
-
+app.include_router(time_router)
 from routers import render
 app.include_router(render.router, prefix="/api/render", tags=["Render APIs"])
-
+app.include_router(health_report_router)
 # CORS Support: https://stackoverflow.com/a/66460861
 origins = [
     ADMIN_WEB_URL,
@@ -131,10 +145,19 @@ app.add_middleware(
 )
 
 # uvicorn main:app --reload --host 0.0.0.0 --port 8000
+# ws_ping_interval/ws_ping_timeout: server sends protocol-level WebSocket PING
+# frames every 8s so otherwise-idle sockets stay alive past intermediate idle
+# timeouts (the ~10-20s reconnect churn). PING/PONG are transport-layer control
+# frames the browser/React Native answer automatically WITHOUT firing onmessage,
+# so this needs zero client change and cannot trigger client refetches. The 30s
+# pong timeout is generous so a backgrounded/slow mobile client is not falsely
+# force-closed.
 if __name__ == '__main__':
     import uvicorn
     if IS_DEV:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=1)
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=1,
+                    ws_ping_interval=8, ws_ping_timeout=30)
     else:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False, workers=2)
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False, workers=2,
+                    ws_ping_interval=8, ws_ping_timeout=30)
     
