@@ -52,6 +52,7 @@ import { RatesForm } from "./payments/rates";
 import { FamilyPicker } from "../family/select";
 import { onError } from "@/common/utils/lib";
 import { useTeleconsultPermissions } from "@/hooks/useTeleconsultPermissions";
+import { apiUrl } from "@/Config";
 
 export const PaymentBreakdown = ({
   breakdown,
@@ -254,18 +255,26 @@ function PaymentScreen() {
       console.log("running api");
 
       const res = await fetch(
-        "https://timeapi.io/api/Time/current/zone?timeZone=Asia/Singapore",
+        `${apiUrl}/time/server`,
       );
 
       const data = await res.json();
 
-      const date = data.hour; // server time
-      console.log(date, "datadatadata");
-      const hours = date;
+      const serverTimeUTC = data.server_time_utc;
 
-      console.log("Singapore Hour:", hours);
+      const singaporeDate = new Date(serverTimeUTC);
 
-      if (hours >= 0 && hours < 6) {
+      const singaporeHour = Number(
+        new Intl.DateTimeFormat("en-US", {
+          timeZone: "Asia/Singapore",
+          hour: "numeric",
+          hour12: false,
+        }).format(singaporeDate)
+      );
+
+      console.log("Singapore Hour:", singaporeHour);
+
+      if (singaporeHour >= 0 && singaporeHour < 6) {
         return "closed";
       } else {
         return "open";
@@ -548,7 +557,7 @@ function PaymentScreen() {
                     <BoldText size={13} style={{ marginTop: 6 }}>
                       {
                         rates.collection_method_messages?.[
-                          formVals.collectionMethod ?? ""
+                        formVals.collectionMethod ?? ""
                         ]
                       }
                     </BoldText>

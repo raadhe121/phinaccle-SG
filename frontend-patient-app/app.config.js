@@ -2,6 +2,10 @@ const bundleID = process.env.APP_VARIANT === 'production' ? "sg.com.pinnaclefami
 const appName = process.env.APP_VARIANT === 'production' ? "PinnacleSG+" : "PinnacleSG+ (Test)"
 const googleServicesiOS = process.env.APP_VARIANT === 'production' ? "./GoogleService-Info-prod.plist" : "./GoogleService-Info-test.plist"
 const googleServicesAndroid = process.env.APP_VARIANT === 'production' ? "./google-services-prod.json" : "./google-services-test.json"
+// const bundleID = "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus";
+// const appName = "PinnacleSG+ (Test)";
+// const googleServicesiOS = "./GoogleService-Info-test.plist";
+// const googleServicesAndroid = "./google-services-test.json";
 
 export default {
     "expo": {

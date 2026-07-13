@@ -13,7 +13,7 @@ type ErrorType = {
 type onErrorCallback = (status: number, msg: ErrorType) => void
 
 type ModalType = {
-    icon?: 'ExclamationCircleFill' | 'CloseCircleFill';
+    icon?: 'ExclamationCircleFill' | 'CloseCircleFill' | 'CheckCircleFill';
     iconColor?: string;
     title: string;
     content?: string | React.ReactNode;
@@ -55,6 +55,7 @@ const defaultModal = ({ icon, iconColor, title, content, labels, onCancel, onOk}
 export const modal = {
     warn: (m: ModalType) => defaultModal({ icon: 'ExclamationCircleFill', iconColor: colors.warning, ...m }),
     error: (m: ModalType) => defaultModal({ icon: 'CloseCircleFill', iconColor: colors.danger, ...m }),
+    success: (m: ModalType) => defaultModal({ icon: 'CheckCircleFill', iconColor: colors.success, ...m }),
 }
 
 export const defaultOnError: onErrorCallback = (status, msg) => {

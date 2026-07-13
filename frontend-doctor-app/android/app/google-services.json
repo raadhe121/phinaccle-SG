@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "436500741944",
+    "project_id": "medical-app-44e52",
+    "storage_bucket": "medical-app-44e52.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436500741944:android:57aaa699bf987f443d0bcd",
+        "android_client_info": {
+          "package_name": "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmN9KJhJViTta1HDv8rxPtbF_SpBCOwT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436500741944:android:4d49601160263ef13d0bcd",
+        "android_client_info": {
+          "package_name": "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus.doctor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmN9KJhJViTta1HDv8rxPtbF_SpBCOwT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

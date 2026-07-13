@@ -238,8 +238,14 @@ const labelRenderer = (type: string, data: number) => {
   }
 
 // Format YYYY-MM-DD
-export const FormDatePicker = ({ value, onChange, placeholder = '', disabled = false }: { value?: string, onChange?: (value: string) => void, placeholder?: string, disabled?: boolean }) => {
+export const FormDatePicker = ({ value, onChange, placeholder = '', disabled = false, minDate, maxDate, disabledDays }: { value?: string, onChange?: (value: string) => void, placeholder?: string, disabled?: boolean, minDate?: string | Date, maxDate?: string | Date, disabledDays?: number[] }) => {
     const formattedDate = value ? dayjs(value).format(dateHumanFormat) : placeholder;
+    const effectiveMinDate = minDate ? dayjs(minDate).format(dateFormat) : dayjs().subtract(110, 'year').format(dateFormat);
+    const effectiveMaxDate = maxDate
+        ? dayjs(maxDate).format(dateFormat)
+        : minDate
+          ? undefined
+          : dayjs().subtract(1, 'day').format(dateFormat);
 
     if (disabled || !onChange) {
         return <FormPicker
@@ -253,8 +259,9 @@ export const FormDatePicker = ({ value, onChange, placeholder = '', disabled = f
     return <NativeDatePicker
         value={value}
         onChange={onChange}
-        minDate={dayjs().subtract(110, 'year').format(dateFormat)}
-        maxDate={dayjs().subtract(1, 'day').format(dateFormat)}
+        minDate={effectiveMinDate}
+        maxDate={effectiveMaxDate}
+        disabledDays={disabledDays}
         >
         <ListItem styles={{
             Content: !value ? antd.disabledColor : { color: 'black' },
