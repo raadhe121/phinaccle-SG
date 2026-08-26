@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import KeyboardView from "@/common/components/KeyboardView";
@@ -161,6 +162,8 @@ const SpecialistRequestsScreen = () => {
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
   const [dateAvailable, setDateAvailable] = useState<boolean | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [rescheduleRemarkChecked, setRescheduleRemarkChecked] = useState(false);
+  const [rescheduleReason, setRescheduleReason] = useState("");
 
   // ── Cancel state ──
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
@@ -213,39 +216,37 @@ const SpecialistRequestsScreen = () => {
     }
   };
   const getMarkedDates = () => {
-    if (!specialistDetail?.day_availability) {
-      return {};
+    const marked: any = {};
+    let current = dayjs().add(3, "day").startOf("day");
+    const end = dayjs().add(6, "month");
+
+    if (!specialistDetail?.day_availability || Object.keys(specialistDetail.day_availability).length === 0) {
+      // If no availability is defined, disable all dates for the next 6 months.
+      while (current.isBefore(end) || current.isSame(end, "day")) {
+        const dateString = current.format("YYYY-MM-DD");
+        marked[dateString] = {
+          disabled: true,
+          disableTouchEvent: true,
+        };
+        current = current.add(1, "day");
+      }
+      return marked;
     }
 
     const availableDays = Object.keys(specialistDetail.day_availability).map(
       (day) => dayNameToNumber[day]
     );
 
-    const marked: any = {};
-
-    const today = dayjs();
-    const end = dayjs().add(6, "month");
-
-    let current = today;
-
     while (current.isBefore(end) || current.isSame(end, "day")) {
       const dateString = current.format("YYYY-MM-DD");
-      const weekDay = current.day();
-
-      if (!availableDays.includes(weekDay)) {
-        marked[dateString] = {
-          disabled: true,
-          disableTouchEvent: true,
-          textColor: "#C4C4C4",
-        };
+      if (!availableDays.includes(current.day())) {
+        marked[dateString] = { disabled: true, disableTouchEvent: true };
       }
-
       current = current.add(1, "day");
     }
 
     if (preferredDate) {
       marked[preferredDate] = {
-        ...(marked[preferredDate] || {}),
         selected: true,
         selectedColor: colors.primary,
         selectedTextColor: "#fff",
@@ -308,7 +309,10 @@ const SpecialistRequestsScreen = () => {
     mutationFn: async (body: {
       preferred_time: string;
       preferred_days: string;
+      additional_info: string | null;
     }) => {
+      console.log(body,"bodybodybodybodybody");
+      
       const res = await fetch(
         `${BASE_URL}/appointment-requests/${selectedRequest?.id}/reschedule`,
         {
@@ -415,6 +419,8 @@ const SpecialistRequestsScreen = () => {
     setTimeSlots([]);
     setDateAvailable(null);
     setSpecialistDetail(null);
+    setRescheduleRemarkChecked(false);
+    setRescheduleReason("");
   };
 
   const openCancel = (item: any) => {
@@ -425,31 +431,75 @@ const SpecialistRequestsScreen = () => {
   };
 
   const handleConfirmReschedule = () => {
-    setRescheduleModalVisible(false);
-    if (!preferredDate || !selectedTime || !selectedRequest) return;
-    modal.warn({
-      title: "Confirm Reschedule",
-      content: (
-        <>
-          <CText>You are rescheduling your appointment with:</CText>
-          <BoldText style={{ marginVertical: 8 }}>
-            {selectedRequest.service ? selectedRequest?.service?.service_name : selectedRequest?.specialist?.name}
-          </BoldText>
-          <CText>
-            to {dayjs(preferredDate).format("ddd, D MMM YYYY")} at{" "}
-            <BoldText>{selectedTime}</BoldText>.
-          </CText>
-        </>
-      ),
-      labels: ["Cancel", "Confirm"],
-      onOk: () => {
-        rescheduleMutation.mutate({
-          preferred_days: dayjs(preferredDate).format("dddd"),
-          preferred_time: selectedTime!,
-        });
+  // Safety guard
+  if (!preferredDate || !selectedTime || !selectedRequest) return;
+  
+  // Close your dropdown/picker modal layout right away
+  // setRescheduleModalVisible(false);
+
+  // Determine the name to display (Plain strings only)
+  const appointmentWith = selectedRequest.service 
+    ? selectedRequest.service.service_name 
+    : selectedRequest.specialist?.name || "";
+
+  const formattedDate = dayjs(preferredDate).format("ddd, D MMM YYYY");
+
+  // 💡 Call the native React Native Alert
+  Alert.alert(
+    "Confirm Reschedule", // Title
+    `You are rescheduling your appointment with:\n\n${appointmentWith}\n\nto ${formattedDate} at ${selectedTime}.`, // Message Body
+    [
+      {
+        text: "Cancel",
+        onPress: () => {
+          // 💡 Does nothing but close the alert. Safe from background mutations!
+          console.log("Reschedule cancelled");
+        },
+        style: "cancel", // Gives it a distinct "cancel" treatment on iOS
       },
-    });
-  };
+      {
+        text: "Confirm",
+        onPress: () => {
+          // 💡 Only fires when they intentionally click Confirm
+          rescheduleMutation.mutate({
+            preferred_days: preferredDate,
+            preferred_time: selectedTime,
+            additional_info: rescheduleRemarkChecked
+              ? rescheduleReason.trim() || null
+              : null,
+          });
+        },
+      },
+    ],
+    { cancelable: true } // On Android, tapping outside the alert will close it like a cross button
+  );
+};
+  // const handleConfirmReschedule = () => {
+  //   setRescheduleModalVisible(false);
+  //   if (!preferredDate || !selectedTime || !selectedRequest) return;
+  //   modal.warn({
+  //     title: "Confirm Reschedule",
+  //     content: (
+  //       <>
+  //         <CText>You are rescheduling your appointment with:</CText>
+  //         <BoldText style={{ marginVertical: 8 }}>
+  //           {selectedRequest.service ? selectedRequest?.service?.service_name : selectedRequest?.specialist?.name}
+  //         </BoldText>
+  //         <CText>
+  //           to {dayjs(preferredDate).format("ddd, D MMM YYYY")} at{" "}
+  //           <BoldText>{selectedTime}</BoldText>.
+  //         </CText>
+  //       </>
+  //     ),
+  //     labels: ["Confirm","Cancel", ],
+  //     onOk: () => {
+  //       rescheduleMutation.mutate({
+  //         preferred_days: dayjs(preferredDate).format("dddd"),
+  //         preferred_time: selectedTime!,
+  //       });
+  //     },
+  //   });
+  // };
 
   const handleConfirmCancel = () => {
     const trimmed = cancelReason.trim();
@@ -457,12 +507,12 @@ const SpecialistRequestsScreen = () => {
       setCancelReasonError("Please provide a reason for cancellation.");
       return;
     }
-    if (trimmed.length < 10) {
-      setCancelReasonError(
-        "Please provide a more detailed reason (at least 10 characters).",
-      );
-      return;
-    }
+    // if (trimmed.length < 10) {
+    //   setCancelReasonError(
+    //     "Please provide a more detailed reason (at least 10 characters).",
+    //   );
+    //   return;
+    // }
     setCancelReasonError("");
     cancelMutation.mutate({ reason: trimmed });
   };
@@ -665,7 +715,7 @@ const SpecialistRequestsScreen = () => {
 
               <Section title="Select New Date" top={0} bottom={0}>
                 <Calendar
-                  minDate={dayjs().format("YYYY-MM-DD")}
+                  minDate={dayjs().add(3, "day").format("YYYY-MM-DD")}
                   markedDates={getMarkedDates()}
                   onDayPress={(day: any) => {
                     if (
@@ -713,6 +763,40 @@ const SpecialistRequestsScreen = () => {
                     ))}
                   </View>
                 </Section>
+              )}
+
+              <TouchableOpacity
+                style={styles.remarkRow}
+                onPress={() => setRescheduleRemarkChecked(!rescheduleRemarkChecked)}
+                activeOpacity={0.7}
+              >
+                <View
+                  style={[
+                    styles.checkbox,
+                    rescheduleRemarkChecked && styles.checkboxChecked,
+                  ]}
+                >
+                  {rescheduleRemarkChecked && (
+                    <CText style={styles.checkmark}>✓</CText>
+                  )}
+                </View>
+                <CText style={styles.remarkText}>
+                  You may provide more information on your reschedule request
+                </CText>
+              </TouchableOpacity>
+
+              {rescheduleRemarkChecked && (
+                <View style={styles.rescheduleReasonInputContainer}>
+                  <TextInput
+                    style={styles.rescheduleReasonInput}
+                    value={rescheduleReason}
+                    onChangeText={setRescheduleReason}
+                    placeholder="Please provide more information here..."
+                    placeholderTextColor={colors.weak}
+                    multiline
+                    textAlignVertical="top"
+                  />
+                </View>
               )}
 
               <Height h={24} />
@@ -855,6 +939,13 @@ const styles = StyleSheet.create({
   selectedTimeSlot: { borderColor: colors.primary },
   timeSlotText: { color: colors.brands1 },
   selectedTimeSlotText: { color: "#fff", fontWeight: "bold" },
+  remarkRow: { flexDirection: "row", alignItems: "flex-start", gap: 10, marginTop: 8 },
+  checkbox: { width: 20, height: 20, borderWidth: 1, borderColor: colors.border, borderRadius: 4, alignItems: "center", justifyContent: "center" },
+  checkboxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
+  checkmark: { color: "#fff", fontWeight: "bold", lineHeight: 18 },
+  remarkText: { flex: 1, color: colors.brands1, fontSize: 14, lineHeight: 20 },
+  rescheduleReasonInputContainer: { marginTop: 10, borderWidth: 1, borderColor: colors.border, borderRadius: 8, backgroundColor: "#fafafa" },
+  rescheduleReasonInput: { minHeight: 96, padding: 12, fontSize: 14, color: colors.brands1 },
 
   // ── Pop-up Styles ──
   popupOverlay: {

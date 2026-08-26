@@ -11,18 +11,16 @@ import {
   ScrollView,
   ImageBackground,
   FlatList,
+  Keyboard,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
   BoldText,
   CText,
-  FormDatePicker,
   HeaderTitleTag,
   Height,
   Label,
-  ListItem,
-  Row,
   Section,
 } from "@/common/components/AntdText";
 import KeyboardView from "@/common/components/KeyboardView";
@@ -44,6 +42,7 @@ interface Specialist {
   service_name?: string;
   clinic_name?: string;
   clinic_photo_path?: string | null;
+  clinic_logo_path?: string | null;
   consultation_fee?: number | string;
   contact_email?: string;
   contact_name?: string;
@@ -108,7 +107,7 @@ interface DoctorDetail {
   };
 }
 
-// ─── Helper: initials from name ───────────────────────────────────────────────
+// ─── Helper: Initials from Name ───────────────────────────────────────────────
 const getInitials = (name?: string, title?: string): string => {
   const n = name || title || "DR";
   const parts = n.trim().split(" ");
@@ -117,126 +116,123 @@ const getInitials = (name?: string, title?: string): string => {
   return n.slice(0, 2).toUpperCase();
 };
 
-const formatTimeSlotLabel = (slot: string): string => {
-  const normalized = slot?.toLowerCase().trim();
-  if (normalized === "morning") return "AM";
-  if (normalized === "afternoon") return "PM";
-  return slot;
-};
-
-// ─── Doctor Profile Header ────────────────────────────────────────────────────
+// ─── Patient-Centric Doctor Profile Header ────────────────────────────────────
 const DoctorProfileHeader = ({ specialist }: { specialist: any }) => {
   const displayName =
     specialist.name || specialist.title || specialist.clinic_name || "Doctor";
   const initials = getInitials(specialist.name, specialist.title);
 
-  const statItems = [
-    specialist.years_of_practice
-      ? { label: "Experience", value: `${specialist.years_of_practice} yrs` }
-      : null,
-    specialist.languages
-      ? { label: "Languages", value: specialist.languages }
-      : null,
-    specialist.consultation_fee != null
-      ? { label: "Fee", value: `$${specialist.consultation_fee}` }
-      : null,
-  ].filter(Boolean) as { label: string; value: string }[];
+  const hasClinicHeader =
+    specialist.clinic_logo_path ||
+    (specialist.clinic_name &&
+      specialist.clinic_name !== specialist.name &&
+      specialist.clinic_name !== specialist.title);
 
   return (
-    <View style={doctorHeaderStyles.wrapper}>
-      {/* Avatar */}
-      <View style={doctorHeaderStyles.avatarWrapper}>
-        {specialist.image_url ? (
-          <Image
-            source={{ uri: specialist.image_url }}
-            style={doctorHeaderStyles.avatarImage}
-          />
-        ) : (
-          <View style={doctorHeaderStyles.avatarFallback}>
-            <Text style={doctorHeaderStyles.avatarInitials}>{initials}</Text>
-          </View>
-        )}
-        {/* Active indicator dot */}
-        
-      </View>
+    <View style={doctorHeaderStyles.container}>
+      {/* 1. Clinic Branding Tile */}
 
-      {/* Name + Specialisation */}
-      <BoldText style={doctorHeaderStyles.doctorName} size={20}>
-        {displayName}
-      </BoldText>
+
+      {/* 2. Doctor Avatar & Profile Details */}
+      <View style={doctorHeaderStyles.profileSection}>
+        <View style={doctorHeaderStyles.avatarContainer}>
+          {specialist.image_url ? (
+            <Image
+              source={{ uri: specialist.image_url }}
+              style={doctorHeaderStyles.avatarImage}
+            />
+          ) : (
+            <View style={doctorHeaderStyles.avatarFallback}>
+              <Text style={doctorHeaderStyles.avatarInitials}>{initials}</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={doctorHeaderStyles.identityInfo}>
+          <BoldText style={doctorHeaderStyles.doctorName} size={19}>
+            {displayName}
+          </BoldText>
+
+          {specialist.specialisation?.name && (
+            <View style={doctorHeaderStyles.specialisationTag}>
+              <CText style={doctorHeaderStyles.specialisationText}>
+                {specialist.specialisation.name}
+              </CText>
+            </View>
+          )}
+
 
           {specialist.credentials && (
             <CText style={doctorHeaderStyles.doctorCredentials} numberOfLines={2}>
               {specialist.credentials}
             </CText>
           )}
-
-      {specialist.specialisation?.name && (
-        <View style={doctorHeaderStyles.specialisationBadge}>
-          <CText style={doctorHeaderStyles.specialisationText}>
-            {specialist.specialisation.name}
-          </CText>
-        </View>
-      )}
-
-      {specialist.clinic_name &&
-        specialist.clinic_name !== specialist.name &&
-        specialist.clinic_name !== specialist.title && (
-          <CText style={doctorHeaderStyles.clinicSubtitle}>
-            {specialist.clinic_name}
-          </CText>
-        )}
-
-      {/* Stats row */}
-      {statItems.length > 0 && (
-        <View style={doctorHeaderStyles.statsRow}>
-          {statItems.map((stat, i) => (
-            <React.Fragment key={stat.label}>
-              {i > 0 && <View style={doctorHeaderStyles.statDivider} />}
-              <View style={doctorHeaderStyles.statItem}>
-                <BoldText style={doctorHeaderStyles.statValue}>
-                  {stat.value}
-                </BoldText>
-                <CText style={doctorHeaderStyles.statLabel}>{stat.label}</CText>
-              </View>
-            </React.Fragment>
-          ))}
-        </View>
-      )}
-
-      {/* Contact row */}
-      {(specialist.contact_email ||
-        specialist.contact_phone ||
-        specialist.contact_name ||
-        specialist.appointment_email) && (
-        <View style={doctorHeaderStyles.contactPills}>
-          {specialist.contact_name && (
-            <View style={doctorHeaderStyles.contactPill}>
-              <CText style={doctorHeaderStyles.contactPillText}>
-                {specialist.contact_name}
-              </CText>
+          {hasClinicHeader && (
+            <View style={doctorHeaderStyles.clinicHeaderRow}>
+              {specialist.clinic_logo_path ? (
+                <View style={doctorHeaderStyles.clinicLogoWrapper}>
+                  <Image
+                    source={{ uri: specialist.clinic_logo_path }}
+                    style={doctorHeaderStyles.clinicLogo}
+                    resizeMode="contain"
+                  />
+                </View>
+              ) : null}
+              {specialist.clinic_name && (
+                <CText style={doctorHeaderStyles.clinicNameText} numberOfLines={1}>
+               {specialist.clinic_name}
+                </CText>
+              )}
             </View>
           )}
-          {specialist.contact_phone && (
-            <View style={doctorHeaderStyles.contactPill}>
-              <CText style={doctorHeaderStyles.contactPillText}>
-                {specialist.contact_phone}
-              </CText>
-            </View>
-          )}
+        </View>
+      </View>
+
+      {/* 3. Key Patient Stats Grid */}
+      <View style={doctorHeaderStyles.statsGrid}>
+        {specialist.years_of_practice ? (
+          <View style={doctorHeaderStyles.statBox}>
+            <CText style={doctorHeaderStyles.statLabel}>EXPERIENCE</CText>
+            <BoldText style={doctorHeaderStyles.statValue}>
+              {specialist.years_of_practice} Yrs
+            </BoldText>
+          </View>
+        ) : null}
+
+        {specialist.consultation_fee != null ? (
+          <View style={doctorHeaderStyles.statBox}>
+            <CText style={doctorHeaderStyles.statLabel}>CONSULT FEE</CText>
+            <BoldText style={doctorHeaderStyles.statValue}>
+              ${specialist.consultation_fee}
+            </BoldText>
+          </View>
+        ) : null}
+
+        {specialist.languages ? (
+          <View style={doctorHeaderStyles.statBox}>
+            <CText style={doctorHeaderStyles.statLabel}>LANGUAGES</CText>
+            <BoldText style={doctorHeaderStyles.statValue} numberOfLines={1}>
+              {specialist.languages}
+            </BoldText>
+          </View>
+        ) : null}
+      </View>
+
+      {/* 4. Contact Pills */}
+      {(specialist.contact_email || specialist.appointment_email) && (
+        <View style={doctorHeaderStyles.contactBar}>
           {specialist.contact_email && (
-            <View style={doctorHeaderStyles.contactPill}>
-              <CText
-                style={doctorHeaderStyles.contactPillText}
-                numberOfLines={1}
-              >
+            <View style={doctorHeaderStyles.contactBadge}>
+              <Text style={doctorHeaderStyles.contactIcon}>✉</Text>
+              <CText style={doctorHeaderStyles.contactText} numberOfLines={1}>
                 {specialist.contact_email}
               </CText>
             </View>
           )}
           {specialist.appointment_email && (
-            <View style={doctorHeaderStyles.contactPill}>
-              <CText style={doctorHeaderStyles.contactPillText} numberOfLines={1}>
+            <View style={doctorHeaderStyles.contactBadge}>
+              <Text style={doctorHeaderStyles.contactIcon}>📅</Text>
+              <CText style={doctorHeaderStyles.contactText} numberOfLines={1}>
                 {specialist.appointment_email}
               </CText>
             </View>
@@ -248,139 +244,163 @@ const DoctorProfileHeader = ({ specialist }: { specialist: any }) => {
 };
 
 const doctorHeaderStyles = StyleSheet.create({
-  wrapper: {
-    alignItems: "center",
+  container: {
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
-    backgroundColor: "#fff",
+    paddingTop: 16,
+    paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
-    marginBottom: 0,
+    borderBottomColor: "#E2E8F0",
   },
-  avatarWrapper: {
+  clinicCard: {
+    backgroundColor: "#F8FAFC",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    alignItems: "center",
+    justifyContent: "center",
+    // marginBottom: 16,
+    // minHeight: 56,
+  },
+  clinicHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    // marginBottom: 6,
+    marginTop:12
+  },
+  clinicLogoWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#F8FAFC",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    padding: 4,
+  },
+  clinicLogo: {
+    width: "100%",
+    height: "100%",
+  },
+  clinicNameText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#334155",
+    flexShrink: 1,
+  },
+
+  profileSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    marginBottom: 18,
+  },
+  avatarContainer: {
     position: "relative",
-    marginBottom: 12,
   },
   avatarImage: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#F1F5F9",
   },
   avatarFallback: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: "#F8FAFC",
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${colors.primary || "#008080"}15`,
     justifyContent: "center",
     alignItems: "center",
   },
   avatarInitials: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: "700",
-    color: colors.brands2,
+    color: colors.primary || "#008080",
   },
-  activeDot: {
-    position: "absolute",
-    bottom: 4,
-    right: 4,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: "#22c55e",
-    borderWidth: 2,
-    borderColor: "#fff",
+  identityInfo: {
+    flex: 1,
+    justifyContent: "center",
   },
   doctorName: {
     color: colors.brands1,
-    textAlign: "center",
-    marginBottom: 6,
-    lineHeight: 26,
+    fontSize: 19,
+    lineHeight: 24,
     fontWeight: "700",
   },
-  specialisationBadge: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+  specialisationTag: {
+    alignSelf: "flex-start",
+    backgroundColor: `${colors.primary || "#008080"}12`,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginTop: 6,
     marginBottom: 4,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
   },
   specialisationText: {
-    fontSize: 13,
-    color: colors.brands2,
+    fontSize: 12,
+    color: colors.primary || "#008080",
     fontWeight: "600",
-    letterSpacing: 0.3,
-  },
-  clinicSubtitle: {
-    fontSize: 13,
-    color: colors.brands3,
-    marginBottom: 4,
-    textAlign: "center",
-  },
-  statsRow: {
-    flexDirection: "row",
-    marginTop: 12,
-    marginBottom: 4,
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    alignSelf: "stretch",
-  },
-  statItem: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 6,
-  },
-  statValue: {
-    fontSize: 15,
-    color: colors.brands1,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  statLabel: {
-    fontSize: 11,
-    color: colors.brands3,
-    marginTop: 3,
-    textAlign: "center",
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: "#E5E7EB",
-    marginVertical: 4,
-  },
-  contactPills: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 6,
-    marginTop: 10,
-  },
-  contactPill: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "#F1F5F9",
   },
   doctorCredentials: {
-    fontSize: 13,
-    color: colors.brands3,
-    marginTop: 4,
-    textAlign: "center",
-  },
-  contactPillText: {
     fontSize: 12,
+    color: "#64748B",
+    marginTop: 2,
+    lineHeight: 16,
+  },
+  statsGrid: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
+  },
+  statBox: {
+    flex: 1,
+    backgroundColor: "#F8FAFC",
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    alignItems: "center",
+  },
+  statLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#94A3B8",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  statValue: {
+    fontSize: 14,
     color: colors.brands1,
+    fontWeight: "700",
+  },
+  contactBar: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  contactBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
+    maxWidth: "100%",
+  },
+  contactIcon: {
+    fontSize: 12,
+  },
+  contactText: {
+    fontSize: 12,
+    color: "#334155",
+    fontWeight: "500",
   },
 });
 
@@ -407,8 +427,7 @@ const SpecialistDetailsPage = () => {
   const [requestEmail, setRequestEmail] = useState<string | undefined>();
   const [emailError, setEmailError] = useState<string | undefined>();
   const [remarkChecked, setRemarkChecked] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const [appointmentId, setAppointmentId] = useState<number | null>(null);
+  const [reason, setReason] = useState("");
   const [showRescheduleCancel, setShowRescheduleCancel] = useState(false);
   const [showDoctorPicker, setShowDoctorPicker] = useState(false);
   const [doctorSearchQuery, setDoctorSearchQuery] = useState("");
@@ -547,50 +566,45 @@ const SpecialistDetailsPage = () => {
   }, [specialist, specialisationSlug]);
 
   const getMarkedDates = () => {
-  if (!specialist?.day_availability) {
-    return {};
-  }
+    const marked: any = {};
+    let current = dayjs().add(3, "day").startOf("day");
+    const end = dayjs().add(6, "month");
 
-  const availableDays = Object.keys(specialist.day_availability).map(
-    (day) => dayNameToNumber[day]
-  );
-
-  const marked: any = {};
-
-  let current = dayjs();
-  const end = dayjs().add(6, "month");
-
-  while (current.isBefore(end) || current.isSame(end, "day")) {
-    const dateString = current.format("YYYY-MM-DD");
-
-    if (!availableDays.includes(current.day())) {
-      marked[dateString] = {
-        disabled: true,
-        disableTouchEvent: true,
-        textColor: "#C4C4C4",
-      };
+    if (!specialist?.day_availability || Object.keys(specialist.day_availability).length === 0) {
+      while (current.isBefore(end) || current.isSame(end, "day")) {
+        const dateString = current.format("YYYY-MM-DD");
+        marked[dateString] = {
+          disabled: true,
+          disableTouchEvent: true,
+        };
+        current = current.add(1, "day");
+      }
+      return marked;
     }
 
-    current = current.add(1, "day");
-  }
+    const availableDays = Object.keys(specialist.day_availability).map(
+      (day) => dayNameToNumber[day]
+    );
 
-  if (preferredDate) {
-    marked[preferredDate] = {
-      ...(marked[preferredDate] || {}),
-      selected: true,
-      selectedColor: colors.primary,
-      selectedTextColor: "#fff",
-    };
-  }
+    while (current.isBefore(end) || current.isSame(end, "day")) {
+      const dateString = current.format("YYYY-MM-DD");
+      if (!availableDays.includes(current.day())) {
+        marked[dateString] = { disabled: true, disableTouchEvent: true };
+      }
+      current = current.add(1, "day");
+    }
 
-  return marked;
-};
+    if (preferredDate) {
+      marked[preferredDate] = { selected: true, selectedColor: colors.primary, selectedTextColor: "#fff", disableTouchEvent: false };
+    }
+    return marked;
+  };
+
   useEffect(() => {
     if (preferredDate && specialist?.day_availability) {
       const dayName = dayjs(preferredDate).format("dddd");
       const slots = specialist.day_availability[dayName] || [];
       setTimeSlots(slots);
-      // Auto-select the first available time slot
       setSelectedTime(slots.length > 0 ? slots[0] : undefined);
     } else {
       setTimeSlots([]);
@@ -616,8 +630,8 @@ const SpecialistDetailsPage = () => {
   };
 
   const handleBookAppointment = () => {
-    console.log(mobileQry.data);
-    
+    Keyboard.dismiss();
+
     if (disableReason === "") {
       modal.warn({
         title: "Confirm Appointment Request",
@@ -626,14 +640,12 @@ const SpecialistDetailsPage = () => {
             <CText>You are requesting an appointment with </CText>
             <BoldText style={{ marginVertical: 8 }}>
               {itemTypeValue === "doctor"
-                ? `Doctor: ${
-                    specialist.name ||
-                    specialist.title ||
-                    specialist.clinic_name
-                  }`
-                : `Service: ${
-                    specialist.service_name || specialist.clinic_name
-                  }`}
+                ? `Doctor: ${specialist.name ||
+                specialist.title ||
+                specialist.clinic_name
+                }`
+                : `Service: ${specialist.service_name || specialist.clinic_name
+                }`}
             </BoldText>
             <CText>
               on {dayjs(preferredDate).format("ddd, D MMM YYYY")} at{" "}
@@ -647,7 +659,7 @@ const SpecialistDetailsPage = () => {
           </>
         ),
         labels: ["Cancel", "Confirm"],
-        onCancel: () => {},
+        onCancel: () => { },
         onOk: () => {
           if (!validateEmail(requestEmail)) {
             return false;
@@ -663,36 +675,38 @@ const SpecialistDetailsPage = () => {
             patient_dob: qry?.data?.date_of_birth,
             contact_number: mobileQry.data?.mobile_number,
             email: requestEmail,
-            preferred_days: preferredDate
-              ? dayjs(preferredDate).format("dddd")
-              : undefined,
-            preferred_time: preferredDate,
+            clinic_name: specialist.clinic_name || selectedDoctor?.clinic_name,
+            preferred_days: preferredDate,
+              // ? dayjs(preferredDate).format("dddd")
+              // : undefined,
+            preferred_time: selectedTime,
+            
             reason:
               itemTypeValue === "doctor" ? "Consultation" : "Service booking",
+            additional_info: remarkChecked ? reason : null
           };
 
+          if (remarkChecked && reason) payload.reason = reason;
           if (itemTypeValue === "doctor") {
             payload.specialist_id = specialist.id;
           } else {
+            
             payload.service_id = specialist.id;
             if (selectedDoctorId) {
               payload.specialist_id = selectedDoctorId;
             }
           }
-
+          console.log(payload,'payloadpayloadpayloadpayload');
+          
           appointmentRequestMutation.mutate(payload);
         },
       });
     } else {
       modal.warn({
         title: "Complete Required Fields",
-        content: (
-          <>
-            <CText>{disableReason}</CText>
-          </>
-        ),
-        labels: ["OK","Cancel"],
-        onOk: () => {},
+        content: <CText>{disableReason}</CText>,
+        labels: ["OK", "Cancel"],
+        onOk: () => { },
       });
     }
   };
@@ -701,7 +715,6 @@ const SpecialistDetailsPage = () => {
     if (!!getEmailError(requestEmail)) return getEmailError(requestEmail);
     if (!preferredDate) return "Please select a preferred date.";
     if (!selectedTime) return "Please select a time slot.";
-    if (!remarkChecked) return "Please check the remark checkbox.";
     if (doctors.length > 0 && !selectedDoctorId)
       return "Please select a doctor for this service.";
     return "";
@@ -726,18 +739,8 @@ const SpecialistDetailsPage = () => {
     return name.slice(0, 2).toUpperCase();
   };
 
-  const getDisabledDays = () => {
-    if (!specialist?.day_availability) {
-      return [0, 1, 2, 3, 4, 5, 6]; // Disable all if not specified
-    }
-    const availableDayNames = Object.keys(specialist.day_availability);
-    const availableDayNumbers = availableDayNames.map((day: any) => dayNameToNumber[day]).filter(n => n !== undefined);
-    const allDays = [0, 1, 2, 3, 4, 5, 6];
-    return allDays.filter(day => !availableDayNumbers.includes(day));
-  };
-
   const renderConsultationFee = () => (
-    <Section title="Consultation Fee" top={16} bottom={8}>
+    <Section title="Consultation Fee" top={0} bottom={8}>
       <View style={styles.minimalFeeRow}>
         <View style={styles.minimalFeeLeft}>
           <CText style={styles.minimalFeeLabel}>Consultation Fee</CText>
@@ -749,13 +752,12 @@ const SpecialistDetailsPage = () => {
     </Section>
   );
 
-  // ─── Shared booking sections (used by both doctor & service) ──────────────
+  // ─── Shared Booking Sections ──────────────────────────────────────────────
   const renderBookingSections = (isServiceFlow = false) => (
     <>
-      {/* Contact Email */}
       <Section
         title={isServiceFlow ? "Patient Input: Contact Email" : "Your Contact Email"}
-        top={16}
+        top={0}
         bottom={0}
       >
         <View style={styles.sectionPadded}>
@@ -775,7 +777,6 @@ const SpecialistDetailsPage = () => {
         </View>
       </Section>
 
-      {/* Request an Appointment */}
       <Section
         title={isServiceFlow ? "Patient Input: Availability" : "Request an Appointment"}
         top={16}
@@ -803,19 +804,19 @@ const SpecialistDetailsPage = () => {
 
           <Label label="Preferred Date">
             <View style={{ paddingHorizontal: 12 }}>
-             <Calendar
-  minDate={dayjs().format("YYYY-MM-DD")}
-  markedDates={getMarkedDates()}
-  disableAllTouchEventsForDisabledDays
-  onDayPress={(day: any) => {
-    setPreferredDate(day.dateString);
-  }}
-  theme={{
-    todayTextColor: colors.primary,
-    arrowColor: colors.primary,
-    textDayFontWeight: "500",
-  }}
-/>
+              <Calendar
+                minDate={dayjs().add(3, "day").format("YYYY-MM-DD")}
+                markedDates={getMarkedDates()}
+                disableAllTouchEventsForDisabledDays
+                onDayPress={(day: any) => {
+                  setPreferredDate(day.dateString);
+                }}
+                theme={{
+                  todayTextColor: "#EF4444",
+                  arrowColor: colors.primary,
+                  textDayFontWeight: "500",
+                }}
+              />
             </View>
           </Label>
 
@@ -848,7 +849,6 @@ const SpecialistDetailsPage = () => {
         </View>
       </Section>
 
-      {/* Remark checkbox */}
       <TouchableOpacity
         style={styles.remarkRow}
         onPress={() => setRemarkChecked(!remarkChecked)}
@@ -864,16 +864,26 @@ const SpecialistDetailsPage = () => {
         </CText>
       </TouchableOpacity>
 
+      {remarkChecked && (
+        <View style={styles.remarkInputContainer}>
+          <TextInput
+            style={styles.remarkInput}
+            value={reason}
+            onChangeText={setReason}
+            placeholder="Please provide more information here..."
+            placeholderTextColor={colors.weak}
+            multiline
+          />
+        </View>
+      )}
     </>
   );
 
-  // ─── Doctor-specific content layout ──────────────────────────────────────
+  // ─── Doctor-Specific Content Layout ──────────────────────────────────────
   const renderDoctorContent = () => (
     <>
-      {/* Profile header replacing banner */}
       <DoctorProfileHeader specialist={specialist} />
 
-      {/* Bio */}
       {(specialist.full_bio || specialist.short_bio || specialist.bio || specialist.service_details) && (
         <Section title="About" top={12} bottom={0}>
           <View style={styles.sectionPadded}>
@@ -884,12 +894,10 @@ const SpecialistDetailsPage = () => {
         </Section>
       )}
 
-      {/* Hospital Affiliations */}
       {specialist.hospital_affiliations && (
-        <Section title="Hospital Affiliations" top={16} bottom={0}>
+        <Section title="Hospital Affiliations" top={0} bottom={0}>
           <View style={styles.fieldContainer}>
             <View style={styles.certificationCard}>
-              <Text style={styles.certificationIcon}></Text>
               <CText style={styles.fieldValue}>
                 {specialist.hospital_affiliations}
               </CText>
@@ -898,12 +906,10 @@ const SpecialistDetailsPage = () => {
         </Section>
       )}
 
-      {/* Board Certifications */}
       {specialist.board_certifications && (
-        <Section title="Board Certifications" top={16} bottom={0}>
+        <Section title="Board Certifications" top={0} bottom={0}>
           <View style={styles.fieldContainer}>
             <View style={styles.certificationCard}>
-              <Text style={styles.certificationIcon}></Text>
               <CText style={styles.fieldValue}>
                 {specialist.board_certifications}
               </CText>
@@ -912,20 +918,17 @@ const SpecialistDetailsPage = () => {
         </Section>
       )}
 
-      {/* Awards */}
       {specialist.awards && (
-        <Section title="Awards & Recognitions" top={16} bottom={0}>
+        <Section title="Awards & Recognitions" top={0} bottom={0}>
           <View style={styles.fieldContainer}>
             <View style={styles.certificationCard}>
-              <Text style={styles.certificationIcon}></Text>
               <CText style={styles.fieldValue}>{specialist.awards}</CText>
             </View>
           </View>
         </Section>
       )}
 
-      {/* Insurance */}
-      <Section title="Insurance Information" top={16} bottom={2}>
+      <Section title="Insurance Information" top={0} bottom={2}>
         <View style={styles.insuranceBody}>
           <View style={styles.insuranceRow}>
             <BoldText style={styles.insuranceLabel}>Insurance (TPA)</BoldText>
@@ -956,10 +959,9 @@ const SpecialistDetailsPage = () => {
     </>
   );
 
-  // ─── Service-specific content layout ─────────────────────────────────────
+  // ─── Service-Specific Content Layout ─────────────────────────────────────
   const renderServiceContent = () => (
     <>
-      {/* Banner */}
       <ImageBackground
         source={{
           uri:
@@ -989,8 +991,22 @@ const SpecialistDetailsPage = () => {
             )}
         </View>
       </ImageBackground>
-
-      {/* Contact row */}
+      <View style={[styles.contactRow,{flexDirection:'row',alignItems:'center',gap:10}]}>
+              {specialist.clinic_logo_path ? (
+                <View style={[doctorHeaderStyles.clinicLogoWrapper,{width:100,height:100}]}>
+                  <Image
+                    source={{ uri: specialist.clinic_logo_path }}
+                    style={doctorHeaderStyles.clinicLogo}
+                    resizeMode="cover"
+                  />
+                </View>
+              ) : null}
+              {specialist.clinic_name && (
+                <CText style={doctorHeaderStyles.clinicNameText} numberOfLines={1}>
+               {specialist.clinic_name}
+                </CText>
+              )}
+      </View>
       <View style={styles.contactRow}>
         {specialist.contact_name && (
           <View style={styles.contactItem}>
@@ -999,13 +1015,7 @@ const SpecialistDetailsPage = () => {
             </CText>
           </View>
         )}
-        {specialist.contact_phone && (
-          <View style={styles.contactItem}>
-            <CText style={styles.contactItemText}>
-              {specialist.contact_phone}
-            </CText>
-          </View>
-        )}
+
         {specialist.contact_email && (
           <View style={styles.contactItem}>
             <CText style={styles.contactItemText} numberOfLines={1}>
@@ -1022,7 +1032,6 @@ const SpecialistDetailsPage = () => {
         )}
       </View>
 
-      {/* Service Details */}
       {specialist.service_details && (
         <Section
           title={itemTypeValue === "doctor" ? "Doctor Details" : "Service Details"}
@@ -1041,39 +1050,7 @@ const SpecialistDetailsPage = () => {
         </Section>
       )}
 
-      {/* Hospital Affiliations */}
-      {specialist.hospital_affiliations && (
-        <Section title="Hospital Affiliations" top={16} bottom={0}>
-          <View style={styles.fieldContainer}>
-            <CText style={styles.fieldValue}>
-              {specialist.hospital_affiliations}
-            </CText>
-          </View>
-        </Section>
-      )}
-
-      {/* Board Certifications */}
-      {specialist.board_certifications && (
-        <Section title="Board Certifications" top={16} bottom={0}>
-          <View style={styles.fieldContainer}>
-            <CText style={styles.fieldValue}>
-              {specialist.board_certifications}
-            </CText>
-          </View>
-        </Section>
-      )}
-
-      {/* Awards */}
-      {specialist.awards && (
-        <Section title="Awards & Recognitions" top={16} bottom={0}>
-          <View style={styles.fieldContainer}>
-            <CText style={styles.fieldValue}>{specialist.awards}</CText>
-          </View>
-        </Section>
-      )}
-
-      {/* About Us */}
-      <Section title="About Us" top={16} bottom={0}>
+      <Section title="About Us" top={8} bottom={0}>
         <View style={styles.fieldContainer}>
           <View style={styles.aboutContainer}>
             <ScrollView nestedScrollEnabled={true}>
@@ -1087,9 +1064,8 @@ const SpecialistDetailsPage = () => {
         </View>
       </Section>
 
-      {/* Experience */}
       {specialist.years_of_practice && (
-        <Section title="Experience" top={16} bottom={0}>
+        <Section title="Experience" top={8} bottom={8}>
           <View style={styles.fieldContainer}>
             <CText style={styles.fieldValue}>
               {specialist.years_of_practice} years
@@ -1098,18 +1074,44 @@ const SpecialistDetailsPage = () => {
         </Section>
       )}
 
-      {/* Languages */}
       {specialist.languages && (
-        <Section title="Languages" top={16} bottom={0}>
+        <Section title="Languages" top={8} bottom={8}>
           <View style={styles.fieldContainer}>
             <CText style={styles.fieldValue}>{specialist.languages}</CText>
           </View>
         </Section>
       )}
 
+      {specialist.hospital_affiliations && (
+        <Section title="Hospital Affiliations" top={8} bottom={8}>
+          <View style={styles.fieldContainer}>
+            <CText style={styles.fieldValue}>
+              {specialist.hospital_affiliations}
+            </CText>
+          </View>
+        </Section>
+      )}
+
+      {specialist.board_certifications && (
+        <Section title="Board Certifications" top={8} bottom={8}>
+          <View style={styles.fieldContainer}>
+            <CText style={styles.fieldValue}>
+              {specialist.board_certifications}
+            </CText>
+          </View>
+        </Section>
+      )}
+
+      {specialist.awards && (
+        <Section title="Awards & Recognitions" top={12} bottom={12}>
+          <View style={styles.fieldContainer}>
+            <CText style={styles.fieldValue}>{specialist.awards}</CText>
+          </View>
+        </Section>
+      )}
+
       {renderConsultationFee()}
 
-      {/* Insurance */}
       <Section title="Insurance Information" top={0} bottom={2}>
         <View style={styles.insuranceBody}>
           <View style={styles.insuranceRow}>
@@ -1209,7 +1211,7 @@ const SpecialistDetailsPage = () => {
         <Height h={32} />
       </KeyboardView>
 
-      {/* Page loader */}
+      {/* Page Loader */}
       <Modal
         visible={loading}
         transparent
@@ -1225,7 +1227,7 @@ const SpecialistDetailsPage = () => {
         </View>
       </Modal>
 
-      {/* Booking loader */}
+      {/* Booking Loader */}
       <Modal
         visible={appointmentRequestMutation.isPending}
         transparent
@@ -1241,7 +1243,7 @@ const SpecialistDetailsPage = () => {
         </View>
       </Modal>
 
-      {/* Reschedule/Cancel modal */}
+      {/* Reschedule/Cancel Modal */}
       <Modal
         visible={showRescheduleCancel}
         transparent
@@ -1498,7 +1500,7 @@ const SpecialistDetailsPage = () => {
 };
 
 const styles = StyleSheet.create({
-  // ── Empty / error states ──────────────────────────────────────────────────
+  // ── Empty / Error States ──────────────────────────────────────────────────
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
@@ -1573,7 +1575,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  // ── Service Contact row ───────────────────────────────────────────────────
+  // ── Service Contact Row ───────────────────────────────────────────────────
   contactRow: {
     flexDirection: "column",
     backgroundColor: colors.brands4 + "44",
@@ -1601,66 +1603,61 @@ const styles = StyleSheet.create({
   // ── Service About ─────────────────────────────────────────────────────────
   aboutContainer: {
     maxHeight: 140,
-    marginHorizontal: 12,
+    width: "100%",
     marginBottom: 4,
   },
   aboutText: {
     lineHeight: 22,
     color: colors.brands1,
     fontSize: 14,
+    textAlign: "left",
   },
 
-  // ── Doctor Bio (no height cap) ────────────────────────────────────────────
+  // ── Doctor Bio ────────────────────────────────────────────────────────────
   bioText: {
+    width: "100%",
     lineHeight: 23,
     color: colors.brands1,
     fontSize: 14,
     paddingBottom: 4,
+    textAlign: "left",
   },
 
-  // ── Doctor certification card ─────────────────────────────────────────────
   certificationCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    marginHorizontal: 12,
-    marginBottom: 4,
+    width: "100%",
     backgroundColor: "#fff",
-    padding: 12,
+    padding: 0,
     borderRadius: 10,
     borderWidth: 0,
   },
-  certificationIcon: {
-    fontSize: 18,
-    marginTop: 1,
-  },
 
-  // ── Generic field container ───────────────────────────────────────────────
+  // ── Generic Field Container ───────────────────────────────────────────────
   fieldContainer: {
-    marginHorizontal: 2,
-    marginBottom: 4,
+    marginBottom: 10,
     paddingVertical: 0,
-    paddingHorizontal: 0,
+    paddingHorizontal: 16,
     backgroundColor: "#ffffff",
     borderRadius: 8,
     borderWidth: 0,
     borderColor: colors.brands4,
   },
   fieldValue: {
+    width: "100%",
     fontSize: 14,
     color: colors.brands1,
     lineHeight: 20,
+    textAlign: "left",
   },
 
-  // ── Insurance ─────────────────────────────────────────────────────────────
+  // ── Insurance Section ─────────────────────────────────────────────────────
   insuranceBody: {
-    marginHorizontal: 16,
+    marginHorizontal: 0,
     marginTop: 8,
     marginBottom: 8,
   },
   insuranceRow: {
     backgroundColor: "white",
-    padding: 12,
+    padding: 16,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#F0F0F0",
@@ -1671,18 +1668,20 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   insuranceValue: {
+    width: "100%",
     fontSize: 14,
     color: colors.brands1,
     lineHeight: 20,
+    textAlign: "left",
   },
   insuranceNotice: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginHorizontal: 16,
+    marginHorizontal: 0,
     marginTop: 10,
     marginBottom: 8,
     backgroundColor: `${colors.brands3}10`,
-    padding: 10,
+    padding: 16,
     borderRadius: 8,
     gap: 6,
   },
@@ -1692,16 +1691,15 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: colors.brands3,
     fontStyle: "italic",
-    marginLeft: 6,
+    textAlign: "left",
   },
 
-  // ── Shared section inner padding ──────────────────────────────────────────
   sectionPadded: {
-    paddingHorizontal: 12,
-    paddingBottom: 2,
+    paddingHorizontal: 16,
+    // paddingBottom: 2,
   },
 
-  // ── Time slots ────────────────────────────────────────────────────────────
+  // ── Time Slots ────────────────────────────────────────────────────────────
   timeSlotsLabel: {
     fontSize: 13,
     color: colors.brands3,
@@ -1741,7 +1739,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  // ── Remark checkbox ───────────────────────────────────────────────────────
+  // ── Remark Checkbox ───────────────────────────────────────────────────────
   remarkRow: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -1783,7 +1781,22 @@ const styles = StyleSheet.create({
     color: colors.brands1,
   },
 
-  // ── Consultation fee ──────────────────────────────────────────────────────
+  remarkInputContainer: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+  },
+  remarkInput: {
+    padding: 12,
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+
+  // ── Consultation Fee ──────────────────────────────────────────────────────
   minimalFeeRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1805,23 +1818,6 @@ const styles = StyleSheet.create({
   minimalFeeAmount: {
     fontSize: 17,
     color: colors.brands2,
-  },
-
-  availabilityRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 8,
-  },
-  availabilityLabel: {
-    width: 96,
-    fontSize: 13,
-    color: colors.brands3,
-    fontWeight: "600",
-  },
-  availabilityValue: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.brands1,
   },
 
   // ── Loaders ───────────────────────────────────────────────────────────────
@@ -1950,7 +1946,7 @@ const styles = StyleSheet.create({
     minHeight: 90,
   },
 
-  // ── Doctor picker trigger ─────────────────────────────────────────────────
+  // ── Doctor Picker Trigger ─────────────────────────────────────────────────
   doctorPickerTrigger: {
     marginHorizontal: 0,
     borderRadius: 14,
@@ -1958,96 +1954,10 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: "#fafafa",
     overflow: "hidden",
-  },
-  doctorPickerPlaceholder: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    gap: 12,
-  },
-  doctorPickerPlaceholderIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: `${colors.brands2}12`,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  doctorPickerPlaceholderIconText: {
-    fontSize: 22,
-  },
-  doctorPickerPlaceholderTitle: {
-    fontSize: 14,
-    color: colors.brands1,
-    fontWeight: "600",
-  },
-  doctorPickerPlaceholderSub: {
-    fontSize: 12,
-    color: colors.brands3,
-    marginTop: 2,
-  },
-  doctorPickerChevron: {
-    fontSize: 26,
-    color: colors.brands3,
-    fontWeight: "300",
-    marginRight: 4,
-  },
-  doctorPickerSelected: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: 12,
-    backgroundColor: `${colors.primary}08`,
-  },
-  doctorPickerAvatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: `${colors.primary}18`,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-    borderWidth: 1.5,
-    borderColor: `${colors.primary}40`,
-  },
-  doctorPickerAvatarImg: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-  },
-  doctorPickerAvatarText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-  doctorPickerSelectedInfo: {
-    flex: 1,
-  },
-  doctorPickerSelectedName: {
-    fontSize: 14,
-    color: colors.brands1,
-    fontWeight: "700",
-  },
-  doctorPickerSelectedSub: {
-    fontSize: 12,
-    color: colors.brands3,
-    marginTop: 2,
-  },
-  doctorPickerChangeBadge: {
-    backgroundColor: `${colors.primary}18`,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  doctorPickerChangeBadgeText: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: "600",
+    padding: 12,
   },
 
-  // ── Doctor picker modal ───────────────────────────────────────────────────
+  // ── Doctor Picker Modal ───────────────────────────────────────────────────
   doctorPickerModal: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 24,
@@ -2183,151 +2093,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#fff",
     fontWeight: "bold",
-  },
-
-  // ── Legacy doctor card styles (kept for safety) ───────────────────────────
-  doctorSectionHeader: {
-    marginHorizontal: 16,
-    marginBottom: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  doctorSectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.brands1,
-  },
-  doctorList: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  doctorCard: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 2,
-    marginBottom: 12,
-  },
-  doctorCardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: `${colors.primary}10`,
-  },
-  doctorRow: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  doctorInfo: {
-    flex: 1,
-    marginRight: 12,
-  },
-  doctorName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.brands1,
-    marginBottom: 4,
-  },
-  doctorSubText: {
-    fontSize: 13,
-    color: colors.brands3,
-    marginBottom: 6,
-  },
-  selectDoctorText: {
-    fontSize: 13,
-    color: colors.brands2,
-    fontWeight: "600",
-  },
-  doctorMeta: {
-    fontSize: 13,
-    color: colors.brands3,
-    marginTop: 12,
-  },
-  doctorAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    backgroundColor: colors.brands4,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  doctorAvatarText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.brands1,
-  },
-  doctorDetails: {
-    flex: 1,
-  },
-  doctorRole: {
-    fontSize: 13,
-    color: colors.brands3,
-    marginBottom: 8,
-  },
-  doctorMetaRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  doctorMetaItem: {
-    fontSize: 12,
-    color: colors.brands3,
-  },
-  doctorSelectNote: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    color: colors.brands3,
-    fontSize: 13,
-    lineHeight: 19,
-  },
-  detailValue: {
-    color: colors.brands3,
-    marginTop: 2,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  affiliationItem: {
-    paddingVertical: 4,
-  },
-  insuranceLine: {
-    lineHeight: 22,
-    fontSize: 14,
-    color: colors.brands1,
-  },
-  insuranceTpa: {
-    marginTop: 6,
-    marginBottom: 4,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "500",
-    marginBottom: 6,
-    color: "#333",
-  },
-  inputContainer: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    height: 48,
-    justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  input: {
-    fontSize: 15,
-    color: "#000",
-  },
-  inputErrorBorder: {
-    borderColor: "#ff4d4f",
   },
 });
 

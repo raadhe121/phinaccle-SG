@@ -152,6 +152,8 @@ const OthersSection = ({ selectedPatients, togglePatientSelection, setSelectedPa
     setMobileNumberError(undefined);
     setFullNameError(undefined);
     setIsEditing(false);
+    setHasReferral(false);
+    setReferralDetails('');
     setEditingId(null);
   };
 
@@ -162,7 +164,7 @@ const OthersSection = ({ selectedPatients, togglePatientSelection, setSelectedPa
         setOthers(
           others?.map((person) =>
             person.id === editingId
-              ? { ...person, name: fullName, mobileNumber: `${mobileCode} ${mobileNumber}` }
+              ? { ...person, name: fullName, mobileNumber: `${mobileCode} ${mobileNumber}`}
               : person
           ) || []
         );
@@ -171,7 +173,7 @@ const OthersSection = ({ selectedPatients, togglePatientSelection, setSelectedPa
         const newPerson = {
           id: `other_${Date.now()}`,
           name: fullName,
-          mobileNumber: `${mobileCode} ${mobileNumber}`
+          mobileNumber: `${mobileCode} ${mobileNumber}`,
         };
         setOthers([...(others || []), newPerson]);
       }
@@ -256,6 +258,7 @@ const OthersSection = ({ selectedPatients, togglePatientSelection, setSelectedPa
                   onChangeText={(val) => validateMobileNumber(val)}
                   placeholder="Enter here" />
               </Label>
+              
             </Section>
             <Height h={24} />
             <View style={{ backgroundColor: colors.brands4 }}>

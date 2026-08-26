@@ -168,7 +168,7 @@ export default function MobileOtpScreen() {
         <KeyboardView navBack={() => router.back()} title='Enter OTP'>
             <Section title={<View style={{ height: 12 }}></View>}>
                 <View style={{ margin: 12 }}>
-                    <CText size={16} style={{ marginBottom: 12 }}>Enter the 6-digit code that is sent to you via SMS on {mobile} (expires in {seconds}s)</CText>
+                    <CText size={16} style={{ marginBottom: 12 }}>Enter the 6-digit code that is sent to you via Whatsapp on {mobile} (expires in {seconds}s)</CText>
                     <OtpInput
                         disabled={otpDisabled}
                         theme={{

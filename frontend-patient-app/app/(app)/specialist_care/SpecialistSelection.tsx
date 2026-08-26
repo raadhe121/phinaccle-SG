@@ -125,7 +125,8 @@ const SpecialistSelection = () => {
       }
 
       setSelectedSpecialisation(selected);
-
+      console.log(selected.specialists,'selected.specialists');
+      
       const specialisationItems: SpecialistItem[] =
         selected.display_mode === "doctors"
           ? (selected.specialists ?? []).map((s) => ({

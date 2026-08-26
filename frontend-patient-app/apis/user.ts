@@ -231,6 +231,20 @@ export const phoneCountryCodes: { label: string, value: PhoneCountryCode }[] = [
     { label: 'Wallis & Futuna (+681)', value: '+681' },
 ]
 
+// Max digits we let the user type in the mobile number field, regardless of country.
+// Actual format is enforced by isValidMobileNumber below (mirrors backend utils/auth.py::is_valid_mobile_number).
+export const MOBILE_NUMBER_MAX_LENGTH = 14;
+
+// Singapore keeps the existing strict local-mobile format (8/9 + 7 digits).
+// Other countries are validated more loosely (digits only, 6-14 digits, no leading zero).
+// E.164 caps the whole number at 15 digits including the country code, so 14 is the ceiling here.
+export const isValidMobileNumber = (mobileCode: string, mobileNumber: string): boolean => {
+    if (mobileCode === '+65') {
+        return /^[89]\d{7}$/.test(mobileNumber);
+    }
+    return /^[1-9]\d{5,13}$/.test(mobileNumber);
+}
+
 export async function fetchProfileApi(
     onError: onErrorCallback = () => {}
 ) {
