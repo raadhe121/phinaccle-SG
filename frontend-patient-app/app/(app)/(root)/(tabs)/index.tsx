@@ -269,6 +269,7 @@ function ServicesCarousel({
         router.navigate("/specialist_care")
       },
       // onPress: showFeatureNotLaunchedDialog,
+      // opacity: 0.4,
       opacity: 1.4,
     },
     // Page 2 - Quick Services

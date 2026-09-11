@@ -40,8 +40,13 @@ export default function WalkInScreen() {
             router.replace('/walkin/consultation')
         },
         onError: (error: ApiError) => {
+            // Timeouts (see OpenAPI.interceptors.request in common/utils/config.ts) never reach
+            // the server, so they surface as a raw AxiosError with no `.body`.
+            const isTimeout = (error as unknown as { code?: string })?.code === 'ECONNABORTED';
             Toast.fail({
-                content: (error.body as { detail?: string })?.detail ?? error.message,
+                content: isTimeout
+                    ? 'Request timed out. Please check your connection and try again.'
+                    : (error.body as { detail?: string })?.detail ?? error.message,
                 duration: 1,
                 stackable: true,
             })

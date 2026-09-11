@@ -1591,6 +1591,7 @@ export type UpdatePatientDiff = {
 };
 
 export type UpdateProfileParams = {
+    // marketing_opt_out: any,
     language: SGiMedLanguage;
 };
 

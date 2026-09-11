@@ -30,7 +30,7 @@ import { modal } from "@/common/utils/modal";
 import dayjs from "dayjs";
 import axios from "axios";
 import { fetchProfileApiUserProfileGet } from "@/services/client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiUrl } from "@/Config";
 import { Calendar } from "react-native-calendars";
 
@@ -147,16 +147,11 @@ const BASE_URL = apiUrl;
 
 const SpecialistRequestsScreen = () => {
   const router = useRouter();
-  const [requests, setRequests] = useState<AppointmentRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const queryClient = useQueryClient();
 
   // ── Reschedule state ──
   const [rescheduleModalVisible, setRescheduleModalVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
-  const [specialistDetail, setSpecialistDetail] =
-    useState<any>(null);
-  const [specialistLoading, setSpecialistLoading] = useState(false);
   const [preferredDate, setPreferredDate] = useState<string | undefined>();
   const [selectedTime, setSelectedTime] = useState<string | undefined>();
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
@@ -176,45 +171,50 @@ const SpecialistRequestsScreen = () => {
     queryFn: fetchProfileApiUserProfileGet,
   });
 
-  const fetchRequests = async () => {
-    try {
-      setLoading(true);
-      setError(false);
+  const requestsQry = useQuery({
+    queryKey: ["appointment-requests"],
+    queryFn: async (): Promise<AppointmentRequest[]> => {
       const response = await axios.get<AppointmentRequest[]>(
         `${BASE_URL}/appointment-requests/`,
         { headers: { accept: "application/json" } },
       );
-      setRequests(response.data);
-    } catch {
-      setError(true);
-      Toast.fail("Failed to load requests. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      return response.data;
+    },
+  });
+  const requests = requestsQry.data ?? [];
+  const loading = requestsQry.isPending;
+  const error = requestsQry.isError;
 
   useEffect(() => {
-    fetchRequests();
-  }, []);
+    if (requestsQry.isError) {
+      Toast.fail("Failed to load requests. Please try again.");
+    }
+  }, [requestsQry.errorUpdatedAt]);
 
-  const fetchSpecialistDetail = async (specialistId: number) => {
-    setSpecialistLoading(true);
-    setSpecialistDetail(null);
-    try {
-      const res = await fetch(`${BASE_URL}/api/admin/services/${specialistId}`);
+  const specialistIdForReschedule: number | undefined =
+    selectedRequest?.service?.id ?? selectedRequest?.specialist?.id;
+
+  const specialistDetailQry = useQuery({
+    queryKey: ["specialist-service", specialistIdForReschedule],
+    queryFn: async (): Promise<SpecialistDetail> => {
+      const res = await fetch(
+        `${BASE_URL}/api/admin/services/${specialistIdForReschedule}`,
+      );
       if (!res.ok) throw new Error("Failed");
-      const data: SpecialistDetail = await res.json();
-      console.log(data, 'SpecialistDetail');
+      return res.json();
+    },
+    enabled: rescheduleModalVisible && !!specialistIdForReschedule,
+  });
+  const specialistDetail:any = specialistDetailQry.data;
+  const specialistLoading = specialistDetailQry.isLoading;
 
-      setSpecialistDetail(data);
-    } catch (e) {
-      console.log(e);
+  useEffect(() => {
+    if (specialistDetailQry.isError) {
       Toast.fail("Could not load specialist availability.");
       setRescheduleModalVisible(false);
-    } finally {
-      setSpecialistLoading(false);
     }
-  };
+  }, [specialistDetailQry.errorUpdatedAt]);
+
   const getMarkedDates = () => {
     const marked: any = {};
     let current = dayjs().add(3, "day").startOf("day");
@@ -309,10 +309,8 @@ const SpecialistRequestsScreen = () => {
     mutationFn: async (body: {
       preferred_time: string;
       preferred_days: string;
-      additional_info: string | null;
+      reason: string | null;
     }) => {
-      console.log(body,"bodybodybodybodybody");
-      
       const res = await fetch(
         `${BASE_URL}/appointment-requests/${selectedRequest?.id}/reschedule`,
         {
@@ -346,7 +344,7 @@ const SpecialistRequestsScreen = () => {
         content:
           "Your appointment has been successfully rescheduled. The service's team will confirm the new time shortly.",
         labels: [null, "OK"],
-        onOk: () => fetchRequests(),
+        onOk: () => queryClient.invalidateQueries({ queryKey: ["appointment-requests"] }),
       });
     },
     onError: (err: Error) => {
@@ -393,7 +391,7 @@ const SpecialistRequestsScreen = () => {
         content:
           "Your appointment has been cancelled. A confirmation email has been sent.",
         labels: [null, "OK"],
-        onOk: () => fetchRequests(),
+        onOk: () => queryClient.invalidateQueries({ queryKey: ["appointment-requests"] }),
       });
     },
     onError: (err: Error) => {
@@ -405,12 +403,6 @@ const SpecialistRequestsScreen = () => {
     resetRescheduleState();
     setSelectedRequest(item);
     setRescheduleModalVisible(true);
-    console.log(item, 'itemitemitemitem');
-    if (item.service) {
-      fetchSpecialistDetail(item.service.id);
-    } else {
-      fetchSpecialistDetail(item.specialist.id);
-    }
   };
 
   const resetRescheduleState = () => {
@@ -418,7 +410,6 @@ const SpecialistRequestsScreen = () => {
     setSelectedTime(undefined);
     setTimeSlots([]);
     setDateAvailable(null);
-    setSpecialistDetail(null);
     setRescheduleRemarkChecked(false);
     setRescheduleReason("");
   };
@@ -464,7 +455,7 @@ const SpecialistRequestsScreen = () => {
           rescheduleMutation.mutate({
             preferred_days: preferredDate,
             preferred_time: selectedTime,
-            additional_info: rescheduleRemarkChecked
+            reason: rescheduleRemarkChecked
               ? rescheduleReason.trim() || null
               : null,
           });
@@ -519,7 +510,7 @@ const SpecialistRequestsScreen = () => {
 
   const RequestCard = ({ item }: { item: any }) => {
     const config = statusConfig[mapStatus(item.status)];
-    const formattedDate = dayjs(item.submitted_at).format("D MMM YYYY, h:mm A");
+    const formattedDate = item.preferred_days
     const scheduledDate = item.updated_at
       ? dayjs(item.updated_at).format("ddd, D MMM YYYY [at] h:mm A")
       : "";
@@ -531,6 +522,8 @@ const SpecialistRequestsScreen = () => {
     const canCancel = ["requested", "rescheduled", "confirmed"].includes(item.status);
 
     return (
+      console.log(item,'itemitemitemitemitem'),
+      
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
@@ -555,7 +548,13 @@ const SpecialistRequestsScreen = () => {
           }
         </View>
 
-        {item.reason && (
+        {
+          item.status_message != null&&<View style={styles.reasonContainer}>
+            <AntdMiniIcon name="FileOutline" size={16} color={colors.brands3} />
+            <CText style={styles.reasonText}>{item.status_message}</CText>
+          </View>
+        }
+        {item.reason &&  item.status_message == null&& (
           <View style={styles.reasonContainer}>
             <AntdMiniIcon name="FileOutline" size={16} color={colors.brands3} />
             <CText style={styles.reasonText}>{item.reason}</CText>
@@ -640,9 +639,13 @@ const SpecialistRequestsScreen = () => {
           <View style={styles.emptyContainer}>
             <AntdMiniIcon name="CloseCircleOutline" size={48} color={colors.danger} />
             <CText style={styles.errorText}>Failed to load requests.</CText>
-            <TouchableOpacity style={styles.retryButton} onPress={() => fetchRequests()}>
+            <TouchableOpacity style={styles.retryButton} onPress={() => requestsQry.refetch()}>
               <CText style={styles.retryButtonText}>Retry</CText>
             </TouchableOpacity>
+          </View>
+        ) : loading && requests.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color={colors.brands2} />
           </View>
         ) : (
           <FlatList
@@ -659,17 +662,6 @@ const SpecialistRequestsScreen = () => {
           />
         )}
       </KeyboardView>
-
-      {/* Global Loaders */}
-      <Modal visible={loading || rescheduleMutation.isPending || cancelMutation.isPending} transparent>
-        <View style={styles.loaderOverlay}>
-          <View style={styles.loaderCard}>
-            <ActivityIndicator size="large" color={colors.brands2} />
-            <Height h={16} />
-            <CText style={styles.loaderText}>Processing...</CText>
-          </View>
-        </View>
-      </Modal>
 
       {/* ── Reschedule Bottom Sheet ── */}
       <Modal
@@ -705,7 +697,7 @@ const SpecialistRequestsScreen = () => {
                 Available:
               </CText>
 
-              {Object.entries(specialistDetail.day_availability).map(
+              {Object.entries(specialistDetail?.day_availability).map(
                 ([day, slots]: [string, any]) => (
                   <CText key={day} style={styles.availableDaysText}>
                     <BoldText>{day}</BoldText>: {slots.join(", ")}
@@ -727,7 +719,7 @@ const SpecialistRequestsScreen = () => {
                     setPreferredDate(day.dateString);
                   }}
                   theme={{
-                    todayTextColor: colors.primary,
+                    todayTextColor: "#EF4444",
                     selectedDayBackgroundColor: colors.primary,
                     selectedDayTextColor: "#fff",
                     arrowColor: colors.primary,
@@ -800,7 +792,12 @@ const SpecialistRequestsScreen = () => {
               )}
 
               <Height h={24} />
-              <Button type="primary" disabled={!preferredDate || !selectedTime || !dateAvailable} onPress={handleConfirmReschedule}>
+              <Button
+                type="primary"
+                disabled={!preferredDate || !selectedTime || !dateAvailable || rescheduleMutation.isPending}
+                loading={rescheduleMutation.isPending}
+                onPress={handleConfirmReschedule}
+              >
                 Confirm Reschedule
               </Button>
               <Height h={32} />
@@ -877,11 +874,16 @@ const SpecialistRequestsScreen = () => {
             </ScrollView>
 
             <View style={{ marginTop: 16 }}>
-              <Button type="warning" onPress={handleConfirmCancel} disabled={!cancelReason.trim()}>
+              <Button
+                type="warning"
+                onPress={handleConfirmCancel}
+                disabled={!cancelReason.trim() || cancelMutation.isPending}
+                loading={cancelMutation.isPending}
+              >
                 Confirm Cancellation
               </Button>
               <Height h={8} />
-              <Button onPress={() => setCancelModalVisible(false)}>
+              <Button onPress={() => setCancelModalVisible(false)} disabled={cancelMutation.isPending}>
                 Keep Appointment
               </Button>
             </View>
@@ -919,9 +921,6 @@ const styles = StyleSheet.create({
   rescheduleButtonText: { color: colors.primary, fontWeight: "600" },
   cancelActionButton: { borderColor: colors.danger, backgroundColor: `${colors.danger}08` },
   cancelActionButtonText: { color: colors.danger, fontWeight: "600" },
-  loaderOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.3)", justifyContent: "center", alignItems: "center" },
-  loaderCard: { backgroundColor: "#fff", padding: 32, borderRadius: 16, alignItems: "center" },
-  loaderText: { color: colors.brands1, fontWeight: "600" },
   sheetBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)" },
   sheet: { backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, height: "80%" },
   sheetHandle: { width: 40, height: 4, backgroundColor: colors.brands4, borderRadius: 2, alignSelf: "center", marginBottom: 16 },

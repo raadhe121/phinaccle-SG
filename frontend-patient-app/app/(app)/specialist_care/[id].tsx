@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -35,44 +35,14 @@ import {
   getMobileApiUserMobileGet,
 } from "@/services/client";
 import { apiUrl } from "@/Config";
+import {
+  RawSpecialist,
+  fetchSpecialisations,
+  findSpecialisation,
+  specialisationsQueryKey,
+} from "./api";
 
-interface Specialist {
-  id: number;
-  active: boolean;
-  service_name?: string;
-  clinic_name?: string;
-  clinic_photo_path?: string | null;
-  clinic_logo_path?: string | null;
-  consultation_fee?: number | string;
-  contact_email?: string;
-  contact_name?: string;
-  contact_phone?: string;
-  board_certifications?: string;
-  bio?: string;
-  languages?: string;
-  years_of_practice?: number;
-  hospital_affiliations?: string;
-  insurance_tpa?: string;
-  insurance_shield_plan?: string;
-  service_details?: string;
-  awards?: string;
-  credentials?: string;
-  short_bio?: string;
-  full_bio?: string;
-  appointment_email?: string;
-  available_days?: string;
-  available_time_slots?: string;
-  day_availability?: { [key: string]: string[] };
-  specialisation_id?: number;
-  specialisation?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
-  experience?: string;
-  rating?: number;
-  reviews?: number;
-}
+type DoctorDetail = RawSpecialist;
 
 const dayNameToNumber: { [key: string]: number } = {
   Sunday: 0,
@@ -83,29 +53,6 @@ const dayNameToNumber: { [key: string]: number } = {
   Friday: 5,
   Saturday: 6,
 };
-
-interface DoctorDetail {
-  id: number;
-  active: boolean;
-  title?: string;
-  name?: string;
-  image_url?: string;
-  clinic_name?: string;
-  clinic_photo_path?: string;
-  consultation_fee?: number;
-  credentials?: string;
-  short_bio?: string;
-  full_bio?: string;
-  languages?: string;
-  bio?: string;
-  years_of_practice?: number;
-  board_certifications?: string;
-  specialisation?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
-}
 
 // ─── Helper: Initials from Name ───────────────────────────────────────────────
 const getInitials = (name?: string, title?: string): string => {
@@ -218,27 +165,7 @@ const DoctorProfileHeader = ({ specialist }: { specialist: any }) => {
         ) : null}
       </View>
 
-      {/* 4. Contact Pills */}
-      {(specialist.contact_email || specialist.appointment_email) && (
-        <View style={doctorHeaderStyles.contactBar}>
-          {specialist.contact_email && (
-            <View style={doctorHeaderStyles.contactBadge}>
-              <Text style={doctorHeaderStyles.contactIcon}>✉</Text>
-              <CText style={doctorHeaderStyles.contactText} numberOfLines={1}>
-                {specialist.contact_email}
-              </CText>
-            </View>
-          )}
-          {specialist.appointment_email && (
-            <View style={doctorHeaderStyles.contactBadge}>
-              <Text style={doctorHeaderStyles.contactIcon}>📅</Text>
-              <CText style={doctorHeaderStyles.contactText} numberOfLines={1}>
-                {specialist.appointment_email}
-              </CText>
-            </View>
-          )}
-        </View>
-      )}
+     
     </View>
   );
 };
@@ -275,17 +202,18 @@ const doctorHeaderStyles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: "#F8FAFC",
-    borderWidth: 1,
+    // backgroundColor: "#F8FAFC",
+    // borderWidth: 1,
     borderColor: "#E2E8F0",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
-    padding: 4,
+    // padding: 4,
   },
   clinicLogo: {
     width: "100%",
     height: "100%",
+    // resizeMode:"cover"
   },
   clinicNameText: {
     fontSize: 14,
@@ -413,14 +341,10 @@ const SpecialistDetailsPage = () => {
     type: itemType,
   } = useLocalSearchParams();
   const itemTypeValue = Array.isArray(itemType) ? itemType[0] : itemType;
-  const [specialist, setSpecialist] = useState<any>(null);
-  const [doctors, setDoctors] = useState<DoctorDetail[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorDetail | null>(
     null
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [preferredDate, setPreferredDate] = useState<string | undefined>();
   const [selectedTime, setSelectedTime] = useState<string | undefined>();
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
@@ -483,87 +407,59 @@ const SpecialistDetailsPage = () => {
     }
   }, [qry?.data?.email]);
 
-  useEffect(() => {
-    if (!id) return;
+  // Doctors are nested inside the (large) specialisations list, shared with the
+  // specialisation/specialist selection screens via this same query key so it's
+  // only fetched once per session instead of on every screen transition.
+  const specialisationsQry = useQuery({
+    queryKey: specialisationsQueryKey,
+    queryFn: fetchSpecialisations,
+  });
 
-    const fetchSpecialistDetails = async () => {
-      setLoading(true);
-      setError(false);
-      try {
-        const itemTypeValue = Array.isArray(itemType) ? itemType[0] : itemType;
-
-        if (itemTypeValue === "doctor") {
-          const response = await fetch(
-            `${apiUrl}/specialisations/active?include_items=true`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch specialist details");
-          }
-          const data = await response.json();
-          const specialisationData = data.find(
-            (spec: any) =>
-              String(spec.id) === String(specialisationSlug) ||
-              spec.slug === specialisationSlug
-          );
-          const selectedDoctor = specialisationData?.specialists?.find(
-            (doc: any) => String(doc.id) === String(id)
-          );
-
-          if (!selectedDoctor) {
-            throw new Error("Specialist not found");
-          }
-
-          setSpecialist(selectedDoctor);
-        } else {
-          const response = await fetch(`${apiUrl}/api/admin/services/${id}`);
-          if (!response.ok) {
-            throw new Error("Failed to fetch specialist details");
-          }
-          const data: Specialist = await response.json();
-          setSpecialist(data);
-        }
-      } catch (err) {
-        setError(true);
-      } finally {
-        setLoading(false);
+  const serviceQry = useQuery({
+    queryKey: ["specialist-service", id],
+    queryFn: async (): Promise<RawSpecialist> => {
+      const response = await fetch(`${apiUrl}/api/admin/services/${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch specialist details");
       }
-    };
+      return response.json();
+    },
+    enabled: itemTypeValue !== "doctor" && !!id,
+  });
 
-    fetchSpecialistDetails();
-  }, [id, specialisationSlug, itemType]);
+  const specialist: any = useMemo(() => {
+    if (itemTypeValue === "doctor") {
+      const specialisationData = findSpecialisation(
+        specialisationsQry.data,
+        specialisationSlug as string | undefined
+      );
+      return specialisationData?.specialists?.find(
+        (doc) => String(doc.id) === String(id)
+      );
+    }
+    return serviceQry.data;
+  }, [itemTypeValue, specialisationsQry.data, specialisationSlug, id, serviceQry.data]);
 
-  useEffect(() => {
-    const fetchSpecialisationDoctors = async () => {
-      const itemTypeValue = Array.isArray(itemType) ? itemType[0] : itemType;
-      if (itemTypeValue === "doctor") return;
-      if (!specialist) return;
+  const doctors: DoctorDetail[] = useMemo(() => {
+    if (itemTypeValue === "doctor" || !specialist) return [];
 
-      const slug =
-        specialisationSlug ||
-        specialist.specialisation?.slug ||
-        String(specialist.specialisation_id || "");
-      if (!slug) return;
+    const slug =
+      specialisationSlug ||
+      specialist.specialisation?.slug ||
+      String(specialist.specialisation_id || "");
+    if (!slug) return [];
 
-      try {
-        const response = await fetch(
-          `${apiUrl}/specialisations/active?include_items=true`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch specialisation doctors");
-        }
-        const data = await response.json();
-        const selected = data.find(
-          (spec: any) =>
-            String(spec.id) === String(slug) || spec.slug === slug
-        );
-        setDoctors(selected?.specialists ?? []);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+    const selected = findSpecialisation(specialisationsQry.data, slug as string);
+    return selected?.specialists ?? [];
+  }, [itemTypeValue, specialist, specialisationSlug, specialisationsQry.data]);
 
-    fetchSpecialisationDoctors();
-  }, [specialist, specialisationSlug]);
+  const loading =
+    itemTypeValue === "doctor" ? specialisationsQry.isPending : serviceQry.isPending;
+  const error =
+    itemTypeValue === "doctor"
+      ? specialisationsQry.isError ||
+        (!specialisationsQry.isPending && !specialist)
+      : serviceQry.isError;
 
   const getMarkedDates = () => {
     const marked: any = {};
@@ -961,15 +857,17 @@ const SpecialistDetailsPage = () => {
 
   // ─── Service-Specific Content Layout ─────────────────────────────────────
   const renderServiceContent = () => (
+    console.log(specialist,'specialist.clinic_photo_path'),
+    
     <>
       <ImageBackground
         source={{
           uri:
-            specialist.clinic_photo_path ||
+            specialist.image_url ||
             "https://via.placeholder.com/400x200",
         }}
         style={styles.bannerImage}
-        imageStyle={{ resizeMode: "cover" }}
+        imageStyle={{ resizeMode: "contain" }}
       >
         <View style={styles.bannerOverlay} />
         {specialist?.specialisation?.name && (
@@ -993,7 +891,7 @@ const SpecialistDetailsPage = () => {
       </ImageBackground>
       <View style={[styles.contactRow,{flexDirection:'row',alignItems:'center',gap:10}]}>
               {specialist.clinic_logo_path ? (
-                <View style={[doctorHeaderStyles.clinicLogoWrapper,{width:100,height:100}]}>
+                <View style={[doctorHeaderStyles.clinicLogoWrapper,{width:140,height:80}]}>
                   <Image
                     source={{ uri: specialist.clinic_logo_path }}
                     style={doctorHeaderStyles.clinicLogo}
@@ -1007,30 +905,30 @@ const SpecialistDetailsPage = () => {
                 </CText>
               )}
       </View>
-      <View style={styles.contactRow}>
-        {specialist.contact_name && (
+      {/* <View style={styles.contactRow}> */}
+        {/* {specialist.contact_name && (
           <View style={styles.contactItem}>
             <CText style={styles.contactItemText}>
               {specialist.contact_name}
             </CText>
           </View>
-        )}
+        )} */}
 
-        {specialist.contact_email && (
+        {/* {specialist.contact_email && (
           <View style={styles.contactItem}>
             <CText style={styles.contactItemText} numberOfLines={1}>
               {specialist.contact_email}
             </CText>
           </View>
-        )}
-        {specialist.appointment_email && (
+        )} */}
+        {/* {specialist.appointment_email && (
           <View style={styles.contactItem}>
             <CText style={styles.contactItemText} numberOfLines={1}>
               {specialist.appointment_email}
             </CText>
           </View>
         )}
-      </View>
+      </View> */}
 
       {specialist.service_details && (
         <Section
@@ -1162,7 +1060,12 @@ const SpecialistDetailsPage = () => {
           !loading &&
           !error &&
           specialist && (
-            <Button type="primary" onPress={handleBookAppointment}>
+            <Button
+              type="primary"
+              loading={appointmentRequestMutation.isPending}
+              disabled={appointmentRequestMutation.isPending}
+              onPress={handleBookAppointment}
+            >
               Appointment Request
             </Button>
           )
@@ -1176,27 +1079,19 @@ const SpecialistDetailsPage = () => {
             <TouchableOpacity
               style={styles.retryButton}
               onPress={() => {
-                setError(false);
-                setLoading(true);
-                fetch(
-                  `https://poculiform-nonenunciative-trenton.ngrok-free.dev/specialists/${id}`
-                )
-                  .then((res) => {
-                    if (!res.ok) throw new Error("Failed");
-                    return res.json();
-                  })
-                  .then((data: Specialist) => {
-                    setSpecialist(data);
-                    setLoading(false);
-                  })
-                  .catch(() => {
-                    setError(true);
-                    setLoading(false);
-                  });
+                if (itemTypeValue === "doctor") {
+                  specialisationsQry.refetch();
+                } else {
+                  serviceQry.refetch();
+                }
               }}
             >
               <CText style={styles.retryButtonText}>Retry</CText>
             </TouchableOpacity>
+          </View>
+        ) : loading ? (
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color={colors.brands2} />
           </View>
         ) : !specialist ? (
           <View style={styles.emptyContainer}>
@@ -1210,38 +1105,6 @@ const SpecialistDetailsPage = () => {
 
         <Height h={32} />
       </KeyboardView>
-
-      {/* Page Loader */}
-      <Modal
-        visible={loading}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-      >
-        <View style={styles.loaderOverlay}>
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color={colors.brands2} />
-            <Height h={16} />
-            <CText style={styles.loaderText}>Loading details...</CText>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Booking Loader */}
-      <Modal
-        visible={appointmentRequestMutation.isPending}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-      >
-        <View style={styles.loaderOverlay}>
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color={colors.brands2} />
-            <Height h={16} />
-            <CText style={styles.loaderText}>Booking appointment...</CText>
-          </View>
-        </View>
-      </Modal>
 
       {/* Reschedule/Cancel Modal */}
       <Modal
@@ -1537,7 +1400,7 @@ const styles = StyleSheet.create({
 
   // ── Service Banner ────────────────────────────────────────────────────────
   bannerImage: {
-    width: "100%",
+    // width: "100%",
     height: 220,
     justifyContent: "space-between",
   },
@@ -1818,33 +1681,6 @@ const styles = StyleSheet.create({
   minimalFeeAmount: {
     fontSize: 17,
     color: colors.brands2,
-  },
-
-  // ── Loaders ───────────────────────────────────────────────────────────────
-  loaderOverlay: {
-    flex: 1,
-    backgroundColor: "transparent",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loaderContainer: {
-    backgroundColor: "#fff",
-    padding: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: 200,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  loaderText: {
-    color: colors.brands1,
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
   },
 
   // ── Modals ────────────────────────────────────────────────────────────────

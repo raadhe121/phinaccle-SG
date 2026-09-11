@@ -74,7 +74,8 @@ export default {
                         "targetSdkVersion": 36,
                         "buildToolsVersion": '36.0.0',
                         "minSdkVersion": 28,
-                        "useLegacyPackaging": false
+                        "useLegacyPackaging": false,
+                        "ndkVersion": "27.1.12297006"
                     },
                     "ios": {
                         "useFrameworks": "static"
@@ -117,6 +118,7 @@ export default {
             // "./plugins/voip-notifications.js",
             "react-native-full-screen-notification-incoming-call",
             "@config-plugins/react-native-callkeep",
+            "./plugins/force-kotlin-stdlib.js",
             "patch-project"
         ],
         "experiments": {

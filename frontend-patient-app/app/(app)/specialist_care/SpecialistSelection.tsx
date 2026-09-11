@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,71 +6,28 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
   ScrollView,
   LayoutAnimation,
   Platform,
   UIManager,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
 import { CText, HeaderTitleTag, Height } from "@/common/components/AntdText";
 import KeyboardView from "@/common/components/KeyboardView";
 import AntdMiniIcon from "@/common/components/AntdMiniIcon";
 import { modal } from "@/common/utils/modal";
 import { colors } from "@/common/utils/config";
-import axios from "axios";
-import { apiUrl } from "@/Config";
+import {
+  RawSpecialist,
+  fetchSpecialisations,
+  findSpecialisation,
+  specialisationsQueryKey,
+} from "./api";
 
 // Enable LayoutAnimation for Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
-}
-
-interface RawSpecialist {
-  id: number;
-  active: boolean;
-  title?: string;
-  name?: string;
-  image_url?: string;
-  banner_image_path?: string | null;
-  bio?: string;
-  short_bio?: string;
-  full_bio?: string;
-  board_certifications?: string;
-  clinic_name?: string;
-  clinic_photo_path?: string;
-  consultation_fee?: number;
-  contact_email?: string;
-  contact_name?: string;
-  contact_phone?: string;
-  created_at?: string;
-  display_order?: number;
-  hospital_affiliations?: string;
-  insurance_shield_plan?: string;
-  insurance_tpa?: string;
-  languages?: string;
-  service_details?: string;
-  service_name?: string;
-  specialisation?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
-  specialisation_id?: number;
-  updated_at?: string | null;
-  years_of_practice?: number;
-}
-
-interface SpecialisationResponse {
-  id: number;
-  name: string;
-  slug: string;
-  description?: string;
-  icon_url?: string;
-  banner_url?: string | null;
-  display_mode?: "doctors" | "services" | string;
-  specialists?: RawSpecialist[];
-  services?: RawSpecialist[];
 }
 
 interface SpecialistItem {
@@ -94,10 +51,6 @@ const SpecialistSelection = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const [items, setItems] = useState<SpecialistItem[]>([]);
-  const [selectedSpecialisation, setSelectedSpecialisation] = useState<SpecialisationResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const specialisationId = Array.isArray(params.specialisation)
@@ -105,74 +58,43 @@ const SpecialistSelection = () => {
     : params.specialisation;
   const Name = params.name;
 
-  const fetchSpecialists = async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const response = await axios.get(
-        `${apiUrl}/specialisations/active?include_items=true`,
-      );
+  const qry = useQuery({
+    queryKey: specialisationsQueryKey,
+    queryFn: fetchSpecialisations,
+  });
 
-      const data: SpecialisationResponse[] = response.data;
-      const selected = data.find(
-        (specialisation) =>
-          String(specialisation.id) === String(specialisationId) ||
-          specialisation.slug === specialisationId,
-      );
+  const selectedSpecialisation = useMemo(
+    () => findSpecialisation(qry.data, specialisationId),
+    [qry.data, specialisationId],
+  );
 
-      if (!selected) {
-        throw new Error("Specialisation not found");
-      }
+  const items: SpecialistItem[] = useMemo(() => {
+    if (!selectedSpecialisation) return [];
 
-      setSelectedSpecialisation(selected);
-      console.log(selected.specialists,'selected.specialists');
-      
-      const specialisationItems: SpecialistItem[] =
-        selected.display_mode === "doctors"
-          ? (selected.specialists ?? []).map((s) => ({
-              id: s.id,
-              available: s.active,
-              type: "doctor",
-              title: s.title,
-              name: s.name,
-              service_name: s.service_name,
-              clinic_name: s.clinic_name,
-              clinic_photo_path: s.clinic_photo_path,
-              image_url: s.image_url,
-              consultation_fee: s.consultation_fee,
-              languages: s.languages,
-              bio: s.short_bio || s.full_bio || s.bio || s.service_details,
-              years_of_practice: s.years_of_practice,
-              board_certifications: s.board_certifications,
-            }))
-          : (selected.services ?? []).map((s) => ({
-              id: s.id,
-              available: s.active,
-              type: "service",
-              title: s.title,
-              name: s.name,
-              service_name: s.service_name,
-              clinic_name: s.clinic_name,
-              clinic_photo_path: s.clinic_photo_path,
-              image_url: s.image_url,
-              consultation_fee: s.consultation_fee,
-              languages: s.languages,
-              bio: s.short_bio || s.full_bio || s.bio || s.service_details,
-              years_of_practice: s.years_of_practice,
-              board_certifications: s.board_certifications,
-            }));
+    const toItem = (s: RawSpecialist): SpecialistItem => ({
+      id: s.id,
+      available: s.active,
+      type: selectedSpecialisation.display_mode === "doctors" ? "doctor" : "service",
+      title: s.title,
+      name: s.name,
+      service_name: s.service_name,
+      clinic_name: s.clinic_name,
+      clinic_photo_path: s.clinic_photo_path,
+      image_url: s.image_url,
+      consultation_fee: s.consultation_fee,
+      languages: s.languages,
+      bio: s.short_bio || s.full_bio || s.bio || s.service_details,
+      years_of_practice: s.years_of_practice,
+      board_certifications: s.board_certifications,
+    });
 
-      setItems(specialisationItems);
-    } catch (err: any) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+    return selectedSpecialisation.display_mode === "doctors"
+      ? (selectedSpecialisation.specialists ?? []).map(toItem)
+      : (selectedSpecialisation.services ?? []).map(toItem);
+  }, [selectedSpecialisation]);
 
-  useEffect(() => {
-    fetchSpecialists();
-  }, [specialisationId]);
+  const loading = qry.isPending;
+  const error = qry.isError || (!!qry.data && !selectedSpecialisation);
 
   const toggleDropdown = (id: number) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -301,9 +223,13 @@ const SpecialistSelection = () => {
           <View style={styles.emptyContainer}>
             <AntdMiniIcon name="CloseCircleOutline" size={48} color={colors.danger} />
             <CText style={styles.errorText}>Failed to load specialisation items.</CText>
-            <TouchableOpacity style={styles.retryButton} onPress={fetchSpecialists}>
+            <TouchableOpacity style={styles.retryButton} onPress={() => qry.refetch()}>
               <CText style={styles.retryButtonText}>Retry</CText>
             </TouchableOpacity>
+          </View>
+        ) : loading ? (
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color={colors.brands2} />
           </View>
         ) : (
           <ScrollView
@@ -345,16 +271,6 @@ const SpecialistSelection = () => {
           </ScrollView>
         )}
       </KeyboardView>
-
-      <Modal visible={loading} transparent animationType="fade" statusBarTranslucent>
-        <View style={styles.loaderOverlay}>
-          <View style={styles.loaderCard}>
-            <ActivityIndicator size="large" color={colors.brands2} />
-            <Height h={12} />
-            <Text style={styles.loaderText}>Loading items...</Text>
-          </View>
-        </View>
-      </Modal>
     </>
   );
 };
@@ -444,15 +360,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30, borderRadius: 12 
   },
   retryButtonText: { color: "#FFF", fontWeight: "700" },
-  loaderOverlay: { 
-    flex: 1, backgroundColor: "rgba(0,0,0,0.05)", 
-    justifyContent: "center", alignItems: "center" 
-  },
-  loaderCard: {
-    backgroundColor: '#FFF', padding: 25, borderRadius: 20, alignItems: 'center',
-    shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 10, elevation: 5
-  },
-  loaderText: { fontSize: 14, color: colors.brands1, fontWeight: '600' }
 });
 
 export default SpecialistSelection;

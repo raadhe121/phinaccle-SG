@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
-  Modal,
   ScrollView,
   LayoutAnimation,
   Platform,
@@ -23,40 +22,23 @@ import {
 import AntdMiniIcon from "@/common/components/AntdMiniIcon";
 import KeyboardView from "@/common/components/KeyboardView";
 import { colors } from "@/common/utils/config";
-import { apiUrl } from "@/Config";
+import {
+  Specialisation,
+  fetchSpecialisations,
+  specialisationsQueryKey,
+} from "./api";
 
 // Enable LayoutAnimation for Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-interface Specialisation {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  icon_url: string;
-  display_mode?: string;
-  specialists?: Array<Record<string, unknown>>;
-  services?: Array<Record<string, unknown>>;
-}
-
-const fetchSpecialisations = async (): Promise<Specialisation[]> => {
-  const response = await fetch(
-    `${apiUrl}/specialisations/active?include_items=true`,
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch specialisations");
-  }
-  return response.json();
-};
-
 const SpecialisationSelection = () => {
   const router = useRouter();
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["specialisations"],
+    queryKey: specialisationsQueryKey,
     queryFn: fetchSpecialisations,
   });
 
@@ -92,6 +74,10 @@ const SpecialisationSelection = () => {
             <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
               <CText style={styles.retryButtonText}>Retry</CText>
             </TouchableOpacity>
+          </View>
+        ) : isLoading ? (
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color={colors.brands2} />
           </View>
         ) : (
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
@@ -176,16 +162,6 @@ const SpecialisationSelection = () => {
           </ScrollView>
         )}
       </KeyboardView>
-
-      <Modal visible={isLoading} transparent animationType="fade" statusBarTranslucent>
-        <View style={styles.loaderOverlay}>
-          <View style={styles.loaderCard}>
-            <ActivityIndicator size="large" color={colors.brands2} />
-            <Height h={16} />
-            <CText style={styles.loaderCardText}>Loading Services...</CText>
-          </View>
-        </View>
-      </Modal>
     </>
   );
 };
@@ -261,9 +237,6 @@ const styles = StyleSheet.create({
   },
   selectButtonText: { color: "#FFF", fontWeight: "700", fontSize: 14, marginRight: 8 },
 
-  loaderOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.05)", justifyContent: "center", alignItems: "center" },
-  loaderCard: { backgroundColor: "#fff", padding: 30, borderRadius: 24, alignItems: "center" },
-  loaderCardText: { color: colors.brands1, fontSize: 15, fontWeight: "600" },
   emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 80 },
   errorText: { color: colors.danger, marginTop: 12, fontWeight: "600" },
   retryButton: { marginTop: 16, backgroundColor: colors.brands2, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 12 },

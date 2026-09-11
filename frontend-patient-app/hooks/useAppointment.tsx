@@ -57,6 +57,7 @@ interface AppointmentState {
   setOthers: (others: OtherInfo[] | null) => void;
   setCorporateCode: (corporateCode: CorporateCode | null) => void;
   setServiceGroups: (indexStr: string, serviceGroup: ServiceGroupState) => void;
+  removeServiceGroup: (index: number) => void;
   resetServiceGroups: () => void;
   setPatients: (patients: Patient[] | null) => void;
   setPatientSurvey: (options: Record<string, string> | null) => void;
@@ -101,6 +102,10 @@ export const AppointmentProvider: React.FC<{
 
         set({ serviceGroups, patients: null, location: null, startDateTime: null });
       } ,
+      removeServiceGroup: (index: number) => {
+        const serviceGroups = (store.getState().serviceGroups || []).filter((_, i) => i !== index);
+        set({ serviceGroups: serviceGroups.length > 0 ? serviceGroups : null, patients: null, location: null, startDateTime: null });
+      },
       resetServiceGroups: () => set({ serviceGroups: null, patients: null, patientSurvey: null, corporateSurvey: null, location: null, startDateTime: null }),
       setPatients: (patients: Patient[] | null) => set({ patients, location: null, startDateTime: null }),
       setLocation: (location: Location | null) => set({ location, startDateTime: null }),

@@ -5,9 +5,11 @@ import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from '@/common/utils/notifications';
 import { RealtimeProvider } from '@/providers/realtime';
 import { updateExpoPushTokenApiUserUpdateExpoPushTokenPost } from '@/services/client';
+import { useCallNotificationRegistration } from '@/hooks/useCallNotificationRegistration';
 import * as Device from 'expo-device';
 import { ActivityIndicator } from 'react-native';
 import { colors } from '@/common/utils/config';
+import { getItem, localStorageNotificationsOptInKey } from '@/common/utils/async_storage';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -28,10 +30,21 @@ export default function AppLayout() {
     const { user, initializing } = useSession();
     const responseListener = useRef<Notifications.Subscription>();
 
+    // Registers this device for "doctor is calling" alerts (iOS VoIP/CallKit,
+    // Android FCM) for the whole authenticated session - not just while the
+    // patient happens to be on the teleconsult booking screen. See the hook
+    // for why that distinction matters.
+    useCallNotificationRegistration(!!user);
+
     useEffect(() => {
         if (!user) return;
 
         const updateDeviceToken = async () => {
+            // Checkbox on signin/register defaults to opted-in; only skip
+            // registration when the user has explicitly unchecked it.
+            const optedIn = await getItem(localStorageNotificationsOptInKey);
+            if (optedIn === false) return;
+
             const token = await registerForPushNotificationsAsync();
             if (!token) return;
             updateExpoPushTokenApiUserUpdateExpoPushTokenPost({ requestBody: {

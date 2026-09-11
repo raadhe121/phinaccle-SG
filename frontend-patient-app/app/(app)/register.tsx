@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react'
+import { TouchableHighlight } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Input, PickerValue, Toast } from '@ant-design/react-native';
+import { colors } from '@/common/utils/config';
 import { modal } from '@/common/utils/modal';
 import { useSession } from '@/ctx';
 import KeyboardView from '@/common/components/KeyboardView';
-import { CMarkdown, FormDatePicker, FormPicker, H1Text, Height, Label, ListItemView, Section } from '@/common/components/AntdText';
+import { BoldText, CCheckbox, CMarkdown, FormDatePicker, FormPicker, H1Text, Height, Label, ListItemView, Section } from '@/common/components/AntdText';
 import { loginUser, registerUserApi } from '@/apis/auth';
 import dayjs from 'dayjs';
 import { dateFormat } from '@/components/date_picker';
 import { $SGiMedGender, $SGiMedLanguage, $SGiMedNationality } from '@/services/client/schemas.gen';
+import { localStorageNotificationsOptInKey, setItem } from '@/common/utils/async_storage';
 
 type RegisterFields = {
     name?: string;
@@ -34,6 +37,15 @@ export default function RegisterScreen() {
     const [ errors, setErrors ] = useState<RegisterFields>({});
     const [ submitPressedOnce, setSubmitPressedOnce ] = useState(false); // This is to only show errors after the first submit
     const [ isLoading, setIsLoading ] = useState(false);
+    const [ notificationsOptIn, setNotificationsOptIn ] = useState(true);
+
+    const toggleNotificationsOptIn = () => {
+        setNotificationsOptIn((prev) => {
+            const next = !prev;
+            setItem(localStorageNotificationsOptInKey, next);
+            return next;
+        });
+    };
 
     const validateRecords = () => {
         let errors: RegisterFields = {};
@@ -157,6 +169,11 @@ export default function RegisterScreen() {
                     placeholder="Select language"
                 />
             </Label>
+            {/* <TouchableHighlight underlayColor={colors.underlay} onPress={toggleNotificationsOptIn}>
+                <ListItemView thumb={<CCheckbox checked={notificationsOptIn} />}>
+                    <BoldText style={{ marginLeft: 8 }}>Notify me about appointments & updates</BoldText>
+                </ListItemView>
+            </TouchableHighlight> */}
         </Section>
 
         <Section title={<Height h={12} />} bottom={24}>

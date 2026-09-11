@@ -16,6 +16,12 @@ export const formatDateTime = (dateStr: string) => dayjs(dateStr.length === 26 ?
 
 // Used across all React Query Mutation functions
 export const onError = (error: ApiError) => {
+    // Axios timeouts (see OpenAPI.interceptors.request in common/utils/config.ts) never reach
+    // the server, so they surface as a raw AxiosError with no `.body`, not an ApiError.
+    if ((error as unknown as { code?: string })?.code === 'ECONNABORTED') {
+        toast.fail('Request timed out. Please check your connection and try again.');
+        return;
+    }
     if (error.body?.hasOwnProperty('message') && error.body?.hasOwnProperty('title')) {
         const msg: { title: string, message: string } = error.body as any;
         const mkStyles = { 

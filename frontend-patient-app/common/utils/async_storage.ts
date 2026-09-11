@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const localStoragePaymentMethodKey = 'defaultPaymentMethod';
 export const localStorageDocumentCodeKey = 'documentCode';
+export const localStorageNotificationsOptInKey = 'notificationsOptIn';
 const localKeys = [localStoragePaymentMethodKey, localStorageDocumentCodeKey];
 
 export const setItem = async (key: string, value: any) => {

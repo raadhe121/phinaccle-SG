@@ -79,7 +79,7 @@ export default function ZoomProviderScreen() {
     </ZoomVideoSdkProvider>
 }
 
-const ZoomScreen = () => {
+export const ZoomScreen = () => {
     usePermission();
 
     const { activity } = useRealtime();
@@ -107,6 +107,15 @@ const ZoomScreen = () => {
                 setUsersInSession([mySelf, ...remoteUsers]);
                 setIsInSession(true);
                 close();
+
+                // Incoming calls leave the OS audio route (CallKit on iOS, ringtone
+                // stream on Android) in a state that isn't loudspeaker, so the callee
+                // can't hear anything until the call is re-joined. Force it explicitly.
+                try {
+                    await zoom.audioHelper.setSpeaker(true);
+                } catch (e) {
+                    console.warn('Failed to force speaker audio route', e);
+                }
             });
             listeners.current.push(sessionJoin);
 
@@ -153,6 +162,13 @@ const ZoomScreen = () => {
             });
 
             try {
+                // On iOS, we just tore down the CallKit call (see ZoomProviderScreen)
+                // that owned the AVAudioSession. Zoom joins with enableCallKit: false,
+                // so it sets up its own session independently - reset it first so it
+                // doesn't inherit a half-deactivated CallKit audio session.
+                if (Platform.OS === 'ios') {
+                    await zoom.audioHelper.resetAudioSession();
+                }
                 await zoom.joinSession(zoomConfig);
             } catch (e) {
                 close();

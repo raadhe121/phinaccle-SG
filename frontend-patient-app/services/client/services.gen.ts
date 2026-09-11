@@ -168,7 +168,7 @@ export const fetchProfileApiUserProfileGet = (): CancelablePromise<FetchProfileA
  * @returns unknown Successful Response
  * @throws ApiError
  */
-export const updateProfileApiUserProfilePost = (data: UpdateProfileApiUserProfilePostData): CancelablePromise<UpdateProfileApiUserProfilePostResponse> => { return __request(OpenAPI, {
+export const updateProfileApiUserProfilePost = (data: UpdateProfileApiUserProfilePostData): CancelablePromise<UpdateProfileApiUserProfilePostResponse> => { return __request(OpenAPI, {    
     method: 'POST',
     url: '/api/user/profile',
     body: data.requestBody,

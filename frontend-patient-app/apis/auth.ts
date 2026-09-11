@@ -30,11 +30,11 @@ export const idValidators: { [key in SGiMedICType]: RegExp } = {
 
 
 export async function loginApi(
-    { idType, idNumber, mobileCode, mobileNumber }: { idType: SGiMedICType, idNumber: string; mobileCode: string; mobileNumber: string }, 
+    { idType, idNumber, mobileCode, mobileNumber }: { idType: SGiMedICType, idNumber: string; mobileCode: string; mobileNumber: string },
     onError: onErrorCallback
 ) {
     const response = await post({
-        url: '/api/auth/login', 
+        url: '/api/auth/login',
         body: { id_type: idType, id_number: idNumber, mobile_code: mobileCode, mobile_number: mobileNumber },
         onError
     });

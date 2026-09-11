@@ -7,9 +7,12 @@ import KeyboardView from '@/common/components/KeyboardView';
 import { CText, FormDatePicker, FormPicker, HeaderTitleTag, Height, Label, ReactQueryChild, Section } from '@/common/components/AntdText';
 import { idLabel, idTypes, idValidators } from '@/apis/auth';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { $SGiMedGender, $SGiMedLanguage, $SGiMedNationality, ApiError, fetchProfileApiUserProfileGet, SGiMedICType, SGiMedLanguage, updateProfileApiUserProfilePost } from '@/services/client';
+import { $SGiMedGender, $SGiMedLanguage, $SGiMedNationality, ApiError, fetchProfileApiUserProfileGet, SGiMedICType, SGiMedLanguage, updateProfileApiUserProfilePost, updateExpoPushTokenApiUserUpdateExpoPushTokenPost } from '@/services/client';
 import { colors } from '@/common/utils/config';
 import AntdMiniIcon from '@/common/components/AntdMiniIcon';
+import { registerForPushNotificationsAsync } from '@/common/utils/notifications';
+import { getItem, localStorageNotificationsOptInKey, setItem } from '@/common/utils/async_storage';
+import * as Device from 'expo-device';
 
 type RegisterFields = {
     ic_type?: string;
@@ -41,15 +44,50 @@ export const UpdateProfileBanner = () => (
 
 export default function RegisterScreen() {
     const { user } = useSession();
-    const [ idType, setIdType ] = useState<SGiMedICType>(idTypes[0]);
-    const [ nric, setNric ] = useState<string>();
-    const [ name, setName ] = useState<string>();
-    const [ dob, setDob ] = useState<string>();
-    const [ nationality, setNationality ] = useState<PickerValue[]>();
-    const [ language, setLanguage ] = useState<PickerValue[]>();
-    const [ gender, setGender ] = useState<PickerValue[]>();
-    const [ errors, setErrors ] = useState<RegisterFields>({});
-    const [ submitPressedOnce, setSubmitPressedOnce ] = useState(false); // This is to only show errors after the first submit
+    const [idType, setIdType] = useState<SGiMedICType>(idTypes[0]);
+    const [nric, setNric] = useState<string>();
+    const [name, setName] = useState<string>();
+    const [dob, setDob] = useState<string>();
+    const [nationality, setNationality] = useState<PickerValue[]>();
+    const [language, setLanguage] = useState<PickerValue[]>();
+    const [gender, setGender] = useState<PickerValue[]>();
+    const [errors, setErrors] = useState<RegisterFields>({});
+    const [submitPressedOnce, setSubmitPressedOnce] = useState(false); // This is to only show errors after the first submit
+    const [notificationsOptIn, setNotificationsOptIn] = useState(true);
+    const [notifLoading, setNotifLoading] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            const stored = await getItem(localStorageNotificationsOptInKey);
+            setNotificationsOptIn(stored !== false);
+        })();
+    }, []);
+
+    const toggleSubscription = async () => {
+        setNotifLoading(true);
+        const next = !notificationsOptIn;
+        await setItem(localStorageNotificationsOptInKey, next);
+        setNotificationsOptIn(next);
+
+        if (next) {
+            const token = await registerForPushNotificationsAsync();
+            if (token) {
+                updateExpoPushTokenApiUserUpdateExpoPushTokenPost({
+                    requestBody: {
+                        token,
+                        device: Device.modelName,
+                    }
+                });
+            }
+        }
+
+        Toast.success({
+            content: next ? 'Subscribed to notifications' : 'Unsubscribed from notifications',
+            duration: 1,
+            stackable: true,
+        });
+        setNotifLoading(false);
+    }
 
     const qry = useQuery({
         queryKey: ['profile'],
@@ -97,7 +135,7 @@ export default function RegisterScreen() {
 
         // if (!nric) errors.nric = 'NRIC is required';
         // else if (nric.length > 0 && !idValidators[idType].test(nric)) errors.nric = 'Please enter a valid ' + (idLabel[idType] ?? 'ID No.');
-    
+
         // if (!name) errors.name = 'Name is required';
         // if (name && name.length < 3) errors.name = 'Name must be more than 3 characters';
         // if (!dob) errors.dob = 'Date of birth is required';
@@ -114,10 +152,10 @@ export default function RegisterScreen() {
         if (submitPressedOnce) {
             validateRecords();
         }
-    }, [name, dob, nationality, language, gender ])
+    }, [name, dob, nationality, language, gender])
 
     const onSubmit = async () => {
-        setSubmitPressedOnce(true);        
+        setSubmitPressedOnce(true);
         if (!validateRecords()) {
             Toast.fail({
                 content: 'Please fix the errors above',
@@ -134,10 +172,12 @@ export default function RegisterScreen() {
                 // name: name!,
                 // date_of_birth: dayjs(value.date_of_birth).format('YYYY-MM-DD'),
                 // nationality: nationality?.[0].toString()! as SGiMedNationality,
+                // marketing_opt_out: notificationsOptIn,
                 language: language?.[0].toString()! as SGiMedLanguage,
                 // gender: gender?.[0].toString()! as SGiMedGender
             }
-        });
+        }
+        );
     }
 
     const action = <Button type="primary" loading={updateMutation.isPending} disabled={updateMutation.isPending} onPress={onSubmit}>Continue</Button>
@@ -146,7 +186,7 @@ export default function RegisterScreen() {
         action={action}
         navBack={() => router.back()}
         title={<HeaderTitleTag tag='My Profile' title='Personal Information' />}
-        >
+    >
         <ReactQueryChild query={qry}>
             <Section title={<UpdateProfileBanner />}>
                 <Label label='ID Type' wrap={false}>
@@ -171,7 +211,7 @@ export default function RegisterScreen() {
                             validateId(idType, val.toUpperCase());
                         }}
                         placeholder="Enter here"
-                        />
+                    />
                 </Label>
                 <Label label='Full Name' error={errors?.name}>
                     <Input
@@ -217,6 +257,18 @@ export default function RegisterScreen() {
                     />
                 </Label>
             </Section>
+            {/* <Section title="Notifications">
+                <View style={{ margin: 20, }}>
+                    <Button
+                        type={notificationsOptIn ? 'ghost' : 'primary'}
+                        loading={notifLoading}
+                        disabled={notifLoading}
+                        onPress={toggleSubscription}
+                    >
+                        {notificationsOptIn ? 'Unsubscribe from Marketing Notifications' : 'Subscribe to Marketing Notifications'}
+                    </Button>
+                </View>
+            </Section> */}
             <Height h={12} />
         </ReactQueryChild>
     </KeyboardView>

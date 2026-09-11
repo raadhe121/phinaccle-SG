@@ -7,6 +7,12 @@ import { apiUrl, publicToken } from '@/Config';
 
 OpenAPI.BASE = apiUrl;
 OpenAPI.TOKEN = async () => (await auth().currentUser?.getIdToken()) ?? publicToken;
+// Without this, a hung request (e.g. a stalled Firebase token refresh on iOS)
+// leaves mutation.isPending stuck true forever, spinning the UI indefinitely.
+OpenAPI.interceptors.request.use((config) => {
+    config.timeout = 25000;
+    return config;
+});
 
 export const theme: Theme = {
     dark: false,

@@ -1,11 +1,12 @@
 import React from "react";
-import { CMarkdown, CText, Height, ListItem, Section, TitleText } from "@/common/components/AntdText";
+import { CMarkdown, CText, Height, ListItem, Row, Section, TitleText } from "@/common/components/AntdText";
 import KeyboardView from "@/common/components/KeyboardView";
+import AntdMiniIcon from "@/common/components/AntdMiniIcon";
 import { Button } from "@ant-design/react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { colors } from "@/common/utils/config";
 import { useAppointmentStore, MAX_BOOKING_DURATION, MAX_SERVICE_GROUPS } from "@/hooks/useAppointment";
-import { Alert, View } from "react-native";
+import { Alert, TouchableOpacity, View } from "react-native";
 import dayjs from "dayjs";
 import { confirmAppointmentApiAppointmentV1ConfirmPost, getPriceApiAppointmentV1ReviewPost } from "@/services/client";
 import { useMutation } from "@tanstack/react-query";
@@ -47,7 +48,7 @@ const CommonPicker = ({ value, placeholder, path, params, disabled }: CommonPick
 export default function AppointmentScreen() {
   const affiliateCode = useAppointmentDeeplink();
   const params = useLocalSearchParams<{ branch_ids?: string }>();
-  const { corporateCode, serviceGroups, patients, patientSurvey, corporateSurvey, others, location, startDateTime, setPayment, setPatients, setBranchIds } = useAppointmentStore();
+  const { corporateCode, serviceGroups, patients, patientSurvey, corporateSurvey, others, location, startDateTime, setPayment, setPatients, setBranchIds, removeServiceGroup } = useAppointmentStore();
   // Calculate total duration of selected services
   const totalDuration = serviceGroups?.reduce((total, group) => total + group.duration, 0) || 0;
   const confirmMutation = useMutation({
@@ -157,18 +158,34 @@ export default function AppointmentScreen() {
     </View>
       {
         serviceGroups?.map((serviceGroup, index) => (
-          <Section key={index} title={<></>} bottom={12}>
-            <CommonPicker
-              key={index}
-              value={
-                <CMarkdown size={14}>
-                  {`**${serviceGroup.name}**\n${serviceGroup.items?.map((item) => item.name).join('\n') ?? ''}`.trim()}
-                </CMarkdown>}
-              placeholder="Select Service"
-              path="appointment/selection/service"
-              params={{ index: index.toString() }}
-            />
-          </Section>
+          <Row key={index} style={{ alignItems: 'stretch', marginBottom: 12 }}>
+            <View style={{ flex: 1 }}>
+              <Section title={<></>} bottom={0}>
+                <CommonPicker
+                  value={
+                    <CMarkdown size={14}>
+                      {`**${serviceGroup.name}**\n${serviceGroup.items?.map((item) => item.name).join('\n') ?? ''}`.trim()}
+                    </CMarkdown>}
+                  placeholder="Select Service"
+                  path="appointment/selection/service"
+                  params={{ index: index.toString() }}
+                />
+              </Section>
+            </View>
+            <TouchableOpacity
+              onPress={() => removeServiceGroup(index)}
+              style={{
+                width: 44,
+                marginRight: 12,
+                borderRadius: 10,
+                backgroundColor: `${colors.danger}12`,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <AntdMiniIcon name="DeleteOutline" size={18} color={colors.danger} />
+            </TouchableOpacity>
+          </Row>
         ))
       }
       {

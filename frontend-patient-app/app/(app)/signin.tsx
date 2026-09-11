@@ -8,6 +8,7 @@ import {
   Modal,
   FlatList,
   TouchableOpacity,
+  TouchableHighlight,
   StyleSheet,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -15,7 +16,7 @@ import { Button, Input } from '@ant-design/react-native';
 import { colors } from '@/common/utils/config';
 import { useSession } from '@/ctx';
 import KeyboardView from '@/common/components/KeyboardView';
-import { CText, FormPicker, Height, Label, Section } from '@/common/components/AntdText';
+import { BoldText, CCheckbox, CText, FormPicker, Height, Label, ListItemView, Section } from '@/common/components/AntdText';
 import { idLabel, idTypes, idValidators, loginApi } from '@/apis/auth';
 import { modal } from '@/common/utils/modal';
 import dayjs from 'dayjs';
@@ -25,6 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SGiMedICType } from '@/services/client';
 import { COUNTRIES, Country } from '@/common/countrylisting';
 import { isValidMobileNumber } from '@/apis/user';
+import { localStorageNotificationsOptInKey, setItem } from '@/common/utils/async_storage';
 
 export type { Country };
 
@@ -163,6 +165,15 @@ export default function LoginScreen() {
   const [idNumberError, setIdNumberError] = useState<string>();
   const [mobileNumber, setMobileNumber] = useState<string>('');
   const [mobileNumberError, setMobileNumberError] = useState<string>();
+  const [notificationsOptIn, setNotificationsOptIn] = useState(true);
+
+  const toggleNotificationsOptIn = () => {
+    setNotificationsOptIn((prev) => {
+      const next = !prev;
+      setItem(localStorageNotificationsOptInKey, next);
+      return next;
+    });
+  };
 
   const validateIdNumber = (type: SGiMedICType, val: string) => {
     const upperVal = val.toUpperCase();
@@ -327,6 +338,7 @@ export default function LoginScreen() {
                     placeholder="Enter here"
                   />
                 </Label>
+               
               </Section>
               <View style={{ height: 12 }} />
             </View>

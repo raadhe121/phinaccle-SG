@@ -1,11 +1,13 @@
 import { modal } from "@/common/utils/modal";
 import { Linking, PermissionsAndroid, Platform } from "react-native";
-import messaging from '@react-native-firebase/messaging';
 import { useEffect } from "react";
-import { updateApnTokenApiUserUpdateApnTokenPost, updateFcmTokenApiUserUpdateFcmTokenPost } from "@/services/client";
 import { useCameraPermissions, useMicrophonePermissions } from "expo-camera";
-import VoipPushNotification from 'react-native-voip-push-notification';
 
+// Note: APN/VoIP (iOS) and FCM (Android) call-notification token registration
+// used to live here, but that meant the backend only ever learned this
+// device's token when the patient happened to be on this screen. The doctor's
+// call can come much later, in a different app session, so registration now
+// happens once per authenticated session instead - see useCallNotificationRegistration.
 export const useTeleconsultPermissions = () => {
     const [ camPerm, camReqPerm ] = useCameraPermissions();
     const [ micPerm, micReqPerm ] = useMicrophonePermissions();
@@ -24,20 +26,9 @@ export const useTeleconsultPermissions = () => {
                 })
             }
   
-            // Get APN / FCM Token for Ringing Notifications for Teleconsult
-            if (Platform.OS === 'ios') {
-                // Register for VoIP push notifications
-                VoipPushNotification.registerVoipToken()
-                // Event listener for VoIP push token registration
-                VoipPushNotification.addEventListener('register', token => {
-                    updateApnTokenApiUserUpdateApnTokenPost({ requestBody: { token }});
-                });
-
-                VoipPushNotification.addEventListener("notification", (notification: any) => {
-                    VoipPushNotification.onVoipNotificationCompleted(notification.uuid);
-                });
-                
-            } else if (Platform.OS === 'android') {
+            // Runtime permission prompts for Teleconsult (token registration is
+            // handled separately at the session level - see useCallNotificationRegistration)
+            if (Platform.OS === 'android') {
                 // Check for Phone & Notifications permissions
                 const notifGranted = await PermissionsAndroid.requestMultiple([
                     // PermissionsAndroid.PERMISSIONS.FOREGROUND_SERVICE_PHONE_CALL,
@@ -55,15 +46,6 @@ export const useTeleconsultPermissions = () => {
                         onCancel: async () => await Linking.openSettings()
                     })
                 }
-
-                // Backend FCM permissions
-                if (!await messaging().hasPermission()) {
-                    const resp = await messaging().requestPermission();
-                }
-
-                // Update FCM token to backend server
-                const deviceToken = await messaging().getToken();
-                updateFcmTokenApiUserUpdateFcmTokenPost({ requestBody: { token: deviceToken }});
             }
         }
         setupCallNotifications();
