@@ -554,10 +554,10 @@ const SpecialistRequestsScreen = () => {
             <CText style={styles.reasonText}>{item.status_message}</CText>
           </View>
         }
-        {item.reason &&  item.status_message == null&& (
+        { (
           <View style={styles.reasonContainer}>
             <AntdMiniIcon name="FileOutline" size={16} color={colors.brands3} />
-            <CText style={styles.reasonText}>{item.reason}</CText>
+            <CText style={styles.reasonText}>{item?.reschedule_reason == null?item?.reason:item?.reschedule_reason}</CText>
           </View>
         )}
 

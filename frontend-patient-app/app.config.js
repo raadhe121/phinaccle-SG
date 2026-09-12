@@ -1,18 +1,18 @@
-const bundleID = process.env.APP_VARIANT === 'production' ? "sg.com.pinnaclefamilyclinic.pinnaclesgplus" : "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus"
-const appName = process.env.APP_VARIANT === 'production' ? "PinnacleSG+" : "PinnacleSG+ (Test)"
-const googleServicesiOS = process.env.APP_VARIANT === 'production' ? "./GoogleService-Info-prod.plist" : "./GoogleService-Info-test.plist"
-const googleServicesAndroid = process.env.APP_VARIANT === 'production' ? "./google-services-prod.json" : "./google-services-test.json"
-// const bundleID = "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus";
-// const appName = "PinnacleSG+ (Test)";
-// const googleServicesiOS = "./GoogleService-Info-test.plist";
-// const googleServicesAndroid = "./google-services-test.json";
+// const bundleID = process.env.APP_VARIANT === 'production' ? "sg.com.pinnaclefamilyclinic.pinnaclesgplus" : "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus"
+// const appName = process.env.APP_VARIANT === 'production' ? "PinnacleSG+" : "PinnacleSG+ (Test)"
+// const googleServicesiOS = process.env.APP_VARIANT === 'production' ? "./GoogleService-Info-prod.plist" : "./GoogleService-Info-test.plist"
+// const googleServicesAndroid = process.env.APP_VARIANT === 'production' ? "./google-services-prod.json" : "./google-services-test.json"
+const bundleID = "sg.com.pinnaclefamilyclinic.pinnaclesgplus";
+const appName = "PinnacleSG+";
+const googleServicesiOS = "./GoogleService-Info-prod.plist";
+const googleServicesAndroid = "./google-services-prod.json";
 
 export default {
     "expo": {
         "name": appName,
         "slug": "pinnaclesg",
         "runtimeVersion": "runtime-1.6",
-        "version": "1.6.8",
+        "version": "1.6.9",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
         "scheme": "pinnaclesgplus",
@@ -26,7 +26,9 @@ export default {
             "infoPlist": {
                 "NSCameraUsageDescription": "App needs camera access for Telemedicine video call",
                 "NSMicrophoneUsageDescription": "App needs microphone access for Telemedicine video call",
-                "NSBluetoothPeripheralUsageDescription": "Required for Bluetooth audio devices"
+                "NSBluetoothPeripheralUsageDescription": "Required for Bluetooth audio devices",
+                "NSPhotoLibraryUsageDescription": "Allow PinnacleSG+ to access your photo library to attach or save images and documents.",
+                "NSPhotoLibraryAddUsageDescription": "Allow PinnacleSG+ to save images and documents to your photo library."
             },
             "bundleIdentifier": bundleID,
             "associatedDomains": ["applinks:pinnacle-admin.geddit-apps.com"],
