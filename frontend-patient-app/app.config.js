@@ -1,11 +1,11 @@
-// const bundleID = process.env.APP_VARIANT === 'production' ? "sg.com.pinnaclefamilyclinic.pinnaclesgplus" : "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus"
-// const appName = process.env.APP_VARIANT === 'production' ? "PinnacleSG+" : "PinnacleSG+ (Test)"
-// const googleServicesiOS = process.env.APP_VARIANT === 'production' ? "./GoogleService-Info-prod.plist" : "./GoogleService-Info-test.plist"
-// const googleServicesAndroid = process.env.APP_VARIANT === 'production' ? "./google-services-prod.json" : "./google-services-test.json"
-const bundleID = "sg.com.pinnaclefamilyclinic.pinnaclesgplus";
-const appName = "PinnacleSG+";
-const googleServicesiOS = "./GoogleService-Info-prod.plist";
-const googleServicesAndroid = "./google-services-prod.json";
+const bundleID = process.env.APP_VARIANT === 'production' ? "sg.com.pinnaclefamilyclinic.pinnaclesgplus" : "sg.com.pinnaclefamilyclinic.test.pinnaclesgplus"
+const appName = process.env.APP_VARIANT === 'production' ? "PinnacleSG+" : "PinnacleSG+ (Test)"
+const googleServicesiOS = process.env.APP_VARIANT === 'production' ? "./GoogleService-Info-prod.plist" : "./GoogleService-Info-test.plist"
+const googleServicesAndroid = process.env.APP_VARIANT === 'production' ? "./google-services-prod.json" : "./google-services-test.json"
+// const bundleID = "sg.com.pinnaclefamilyclinic.pinnaclesgplus";
+// const appName = "PinnacleSG+";
+// const googleServicesiOS = "./GoogleService-Info-prod.plist";
+// const googleServicesAndroid = "./google-services-prod.json";
 
 export default {
     "expo": {

@@ -6,9 +6,20 @@ import auth from '@react-native-firebase/auth';
 import { apiUrl, publicToken } from '@/Config';
 
 OpenAPI.BASE = apiUrl;
-OpenAPI.TOKEN = async () => (await auth().currentUser?.getIdToken()) ?? publicToken;
-// Without this, a hung request (e.g. a stalled Firebase token refresh on iOS)
-// leaves mutation.isPending stuck true forever, spinning the UI indefinitely.
+// getIdToken() is awaited before the axios call is even built (see getHeaders()
+// in services/client/core/request.ts), so the axios `timeout` below never kicks
+// in if Firebase's own token refresh stalls (seen on iOS). Race it separately so
+// token resolution itself can't hang the request forever.
+OpenAPI.TOKEN = async () => {
+    const currentUser = auth().currentUser;
+    if (!currentUser) return publicToken;
+
+    const timeout = new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 10000));
+    const token = await Promise.race([currentUser.getIdToken(), timeout]);
+    return token ?? publicToken;
+};
+// Without this, a hung request leaves mutation.isPending stuck true forever,
+// spinning the UI indefinitely.
 OpenAPI.interceptors.request.use((config) => {
     config.timeout = 25000;
     return config;

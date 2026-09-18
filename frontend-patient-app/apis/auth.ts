@@ -76,21 +76,25 @@ type RegisterParams = {
     nationality: string;
     language: string;
     gender: string;
+    notificationsOptIn: boolean;
+    marketingOptIn: boolean;
 }
 
 export async function registerUserApi(
-    { sessionId, name, dateOfBirth, nationality, language, gender }: RegisterParams,
+    { sessionId, name, dateOfBirth, nationality, language, gender, notificationsOptIn, marketingOptIn }: RegisterParams,
     onError: onErrorCallback
 ) {
     const response = await post({
-        url: '/api/auth/register', 
+        url: '/api/auth/register',
         body: {
             "session_id": sessionId,
             "name": name,
             "date_of_birth": dateOfBirth,
             "nationality": nationality,
             "language": language,
-            "gender": gender
+            "gender": gender,
+            "enable_notifications": notificationsOptIn,
+            "marketing_opt_in": marketingOptIn
         },
         onError
     });

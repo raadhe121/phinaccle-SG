@@ -10,7 +10,13 @@ type ErrorType = {
 export type onErrorCallback = (status: number, msg: ErrorType) => void
 
 export const getHeaders = async () => {
-    const userOrFixedToken = (await auth().currentUser?.getIdToken()) ?? publicToken;
+    const currentUser = auth().currentUser;
+    // Race getIdToken() so a stalled Firebase token refresh (seen on iOS) can't
+    // hang this indefinitely - falls back to the public token on timeout.
+    const timeout = new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 10000));
+    const userOrFixedToken = currentUser
+        ? (await Promise.race([currentUser.getIdToken(), timeout])) ?? publicToken
+        : publicToken;
     return {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${userOrFixedToken}`,

@@ -1,6 +1,7 @@
 import { Redirect, Stack, router } from 'expo-router';
 import { useSession } from '../../../ctx';
 import { useEffect, useRef } from 'react';
+import { Linking } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from '@/common/utils/notifications';
 import { RealtimeProvider } from '@/providers/realtime';
@@ -58,9 +59,11 @@ export default function AppLayout() {
         responseListener.current =
             Notifications.addNotificationResponseReceivedListener((response) => {
                 const trigger = response.notification.request.trigger as Notifications.PushNotificationTrigger;
-                const body = trigger.payload?.body as { pathname?: string, params?: { [key: string]: any } };
-                if (body?.pathname) {
-                    router.navigate({ pathname: body.pathname as any, params: body.params })
+                const data = trigger.payload?.data as { pathname?: string, params?: { [key: string]: any }, url?: string };
+                if (data?.pathname) {
+                    router.navigate({ pathname: data.pathname as any, params: data.params })
+                } else if (data?.url) {
+                    Linking.openURL(data.url);
                 }
             });
 

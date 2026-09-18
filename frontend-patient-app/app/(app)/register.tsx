@@ -38,6 +38,7 @@ export default function RegisterScreen() {
     const [ submitPressedOnce, setSubmitPressedOnce ] = useState(false); // This is to only show errors after the first submit
     const [ isLoading, setIsLoading ] = useState(false);
     const [ notificationsOptIn, setNotificationsOptIn ] = useState(true);
+    const [ marketingOptIn, setMarketingOptIn ] = useState(true);
 
     const toggleNotificationsOptIn = () => {
         setNotificationsOptIn((prev) => {
@@ -46,6 +47,8 @@ export default function RegisterScreen() {
             return next;
         });
     };
+
+    const toggleMarketingOptIn = () => setMarketingOptIn((prev) => !prev);
 
     const validateRecords = () => {
         let errors: RegisterFields = {};
@@ -87,7 +90,9 @@ export default function RegisterScreen() {
                 dateOfBirth: dayjs(dob).format('YYYY-MM-DD'),
                 nationality: nationality?.[0].toString()!,
                 language: language?.[0].toString()!,
-                gender: gender?.[0].toString()!
+                gender: gender?.[0].toString()!,
+                notificationsOptIn: notificationsOptIn,
+                marketingOptIn: marketingOptIn
             },
             (status, msg) => {
                 modal.error({
@@ -169,11 +174,16 @@ export default function RegisterScreen() {
                     placeholder="Select language"
                 />
             </Label>
-            {/* <TouchableHighlight underlayColor={colors.underlay} onPress={toggleNotificationsOptIn}>
+            <TouchableHighlight underlayColor={colors.underlay} onPress={toggleNotificationsOptIn}>
                 <ListItemView thumb={<CCheckbox checked={notificationsOptIn} />}>
-                    <BoldText style={{ marginLeft: 8 }}>Notify me about appointments & updates</BoldText>
+                    <BoldText style={{ marginLeft: 8 }}>Notify me about appointments</BoldText>
                 </ListItemView>
-            </TouchableHighlight> */}
+            </TouchableHighlight>
+            <TouchableHighlight underlayColor={colors.underlay} onPress={toggleMarketingOptIn}>
+                <ListItemView thumb={<CCheckbox checked={marketingOptIn} />}>
+                    <BoldText style={{ marginLeft: 8 }}>Send me newsletters about health & medical info</BoldText>
+                </ListItemView>
+            </TouchableHighlight>
         </Section>
 
         <Section title={<Height h={12} />} bottom={24}>
