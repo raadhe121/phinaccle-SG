@@ -116,6 +116,7 @@ export default function AppLayout() {
             <Stack.Screen name="appointment" options={{ title: 'Book Appointment', headerBackTitle: 'Home', headerShown: false }} />
 
             <Stack.Screen name="profile/details" options={{ title: 'Profile', headerBackTitle: 'Back', headerShown: false }} />
+            <Stack.Screen name="profile/notification-settings" options={{ title: 'Notification Settings', headerBackTitle: 'Back', headerShown: false }} />
             <Stack.Screen name="profile/mobile" options={{ title: 'Mobile Number', headerBackTitle: 'Back', headerShown: false }} />
             <Stack.Screen name="profile/otp" options={{ title: 'Verify OTP', headerBackTitle: 'Back', headerShown: false }} />
             <Stack.Screen name="profile/address" options={{ title: 'Address', headerBackTitle: 'Back', headerShown: false }} />

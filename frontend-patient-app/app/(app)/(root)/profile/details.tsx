@@ -7,12 +7,9 @@ import KeyboardView from '@/common/components/KeyboardView';
 import { CText, FormDatePicker, FormPicker, HeaderTitleTag, Height, Label, ReactQueryChild, Section } from '@/common/components/AntdText';
 import { idLabel, idTypes, idValidators } from '@/apis/auth';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { $SGiMedGender, $SGiMedLanguage, $SGiMedNationality, ApiError, fetchProfileApiUserProfileGet, SGiMedICType, SGiMedLanguage, updateProfileApiUserProfilePost, updateExpoPushTokenApiUserUpdateExpoPushTokenPost } from '@/services/client';
+import { $SGiMedGender, $SGiMedLanguage, $SGiMedNationality, ApiError, fetchProfileApiUserProfileGet, SGiMedICType, SGiMedLanguage, updateProfileApiUserProfilePost } from '@/services/client';
 import { colors } from '@/common/utils/config';
 import AntdMiniIcon from '@/common/components/AntdMiniIcon';
-import { registerForPushNotificationsAsync } from '@/common/utils/notifications';
-import { getItem, localStorageMarketingOptInKey, localStorageNotificationsOptInKey, setItem } from '@/common/utils/async_storage';
-import * as Device from 'expo-device';
 
 type RegisterFields = {
     ic_type?: string;
@@ -53,93 +50,6 @@ export default function RegisterScreen() {
     const [gender, setGender] = useState<PickerValue[]>();
     const [errors, setErrors] = useState<RegisterFields>({});
     const [submitPressedOnce, setSubmitPressedOnce] = useState(false); // This is to only show errors after the first submit
-    const [notificationsOptIn, setNotificationsOptIn] = useState(true);
-    const [notifLoading, setNotifLoading] = useState(false);
-    const [marketingOptIn, setMarketingOptIn] = useState(true);
-    const [marketingLoading, setMarketingLoading] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            const stored = await getItem(localStorageNotificationsOptInKey);
-            setNotificationsOptIn(stored !== false);
-            const storedMarketing = await getItem(localStorageMarketingOptInKey);
-            setMarketingOptIn(storedMarketing !== false);
-        })();
-    }, []);
-
-    // The generated UpdateProfileParams type only declares `language` today -
-    // enable_notifications/marketing_opt_in aren't in the backend schema yet,
-    // so this cast is needed until the backend adds those fields.
-    const syncNotificationPrefs = (overrides: { enable_notifications?: boolean, marketing_opt_in?: boolean }) => {
-        return updateProfileApiUserProfilePost({
-            requestBody: {
-                language: language?.[0].toString()! as SGiMedLanguage,
-                enable_notifications: notificationsOptIn,
-                marketing_opt_in: marketingOptIn,
-                ...overrides,
-            } as any
-        });
-    }
-
-    const toggleSubscription = async () => {
-        setNotifLoading(true);
-        const next = !notificationsOptIn;
-
-        try {
-            await syncNotificationPrefs({ enable_notifications: next });
-            await setItem(localStorageNotificationsOptInKey, next);
-            setNotificationsOptIn(next);
-
-            if (next) {
-                const token = await registerForPushNotificationsAsync();
-                if (token) {
-                    updateExpoPushTokenApiUserUpdateExpoPushTokenPost({
-                        requestBody: {
-                            token,
-                            device: Device.modelName,
-                        }
-                    });
-                }
-            }
-
-            Toast.success({
-                content: next ? 'Subscribed to appointment notifications' : 'Unsubscribed from appointment notifications',
-                duration: 1,
-                stackable: true,
-            });
-        } catch (error: any) {
-            Toast.fail({
-                content: (error?.body as { detail?: string })?.detail ?? error?.message ?? 'Failed to update preference',
-                duration: 1,
-                stackable: true,
-            });
-        }
-        setNotifLoading(false);
-    }
-
-    const toggleMarketingSubscription = async () => {
-        setMarketingLoading(true);
-        const next = !marketingOptIn;
-
-        try {
-            await syncNotificationPrefs({ marketing_opt_in: next });
-            await setItem(localStorageMarketingOptInKey, next);
-            setMarketingOptIn(next);
-
-            Toast.success({
-                content: next ? 'Subscribed to newsletter' : 'Unsubscribed from newsletter',
-                duration: 1,
-                stackable: true,
-            });
-        } catch (error: any) {
-            Toast.fail({
-                content: (error?.body as { detail?: string })?.detail ?? error?.message ?? 'Failed to update preference',
-                duration: 1,
-                stackable: true,
-            });
-        }
-        setMarketingLoading(false);
-    }
 
     const qry = useQuery({
         queryKey: ['profile'],
@@ -308,28 +218,6 @@ export default function RegisterScreen() {
                         placeholder="Select language"
                     />
                 </Label>
-            </Section>
-            <Section title="Notifications">
-                <View style={{ margin: 20 }}>
-                    <Button
-                        type={notificationsOptIn ? 'ghost' : 'primary'}
-                        loading={notifLoading}
-                        disabled={notifLoading}
-                        onPress={toggleSubscription}
-                    >
-                        {notificationsOptIn ? 'Unsubscribe from Appointment Notifications' : 'Subscribe to Appointment Notifications'}
-                    </Button>
-                </View>
-                <View style={{ marginLeft: 20, marginRight: 20, marginBottom: 20 }}>
-                    <Button
-                        type={marketingOptIn ? 'ghost' : 'primary'}
-                        loading={marketingLoading}
-                        disabled={marketingLoading}
-                        onPress={toggleMarketingSubscription}
-                    >
-                        {marketingOptIn ? 'Unsubscribe from Newsletter' : 'Subscribe to Newsletter'}
-                    </Button>
-                </View>
             </Section>
             <Height h={12} />
         </ReactQueryChild>

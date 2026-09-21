@@ -251,6 +251,18 @@ export const $AddressParams = {
     title: 'AddressParams'
 } as const;
 
+export const $AppointmentCancelRequest = {
+    properties: {
+        reason: {
+            type: 'string',
+            title: 'Reason'
+        }
+    },
+    type: 'object',
+    required: ['reason'],
+    title: 'AppointmentCancelRequest'
+} as const;
+
 export const $AppointmentCategory = {
     type: 'string',
     enum: ['general', 'specialist'],
@@ -366,6 +378,7 @@ export const $AppointmentDetailsPaymentsPayment = {
         remarks: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -546,6 +559,338 @@ export const $AppointmentListItem = {
     type: 'object',
     required: ['id', 'sgimed_appointment_id', 'patient_name', 'patient_mobile', 'services', 'branch_name', 'start_datetime', 'duration', 'status', 'total_amount', 'corporate_code', 'patient_survey', 'group_id', 'is_guest', 'created_at'],
     title: 'AppointmentListItem'
+} as const;
+
+export const $AppointmentRequestCreate = {
+    properties: {
+        specialisation_id: {
+            type: 'integer',
+            title: 'Specialisation Id'
+        },
+        specialist_id: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Specialist Id'
+        },
+        service_id: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Service Id'
+        },
+        patient_name: {
+            type: 'string',
+            title: 'Patient Name'
+        },
+        patient_dob: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Patient Dob'
+        },
+        contact_number: {
+            type: 'string',
+            title: 'Contact Number'
+        },
+        email: {
+            type: 'string',
+            format: 'email',
+            title: 'Email'
+        },
+        preferred_days: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Preferred Days'
+        },
+        preferred_time: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Preferred Time'
+        },
+        reason: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Reason'
+        },
+        additional_info: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Additional Info'
+        }
+    },
+    type: 'object',
+    required: ['specialisation_id', 'patient_name', 'contact_number', 'email'],
+    title: 'AppointmentRequestCreate'
+} as const;
+
+export const $AppointmentRequestResponse = {
+    properties: {
+        specialisation_id: {
+            type: 'integer',
+            title: 'Specialisation Id'
+        },
+        specialist_id: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Specialist Id'
+        },
+        service_id: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Service Id'
+        },
+        patient_name: {
+            type: 'string',
+            title: 'Patient Name'
+        },
+        patient_dob: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Patient Dob'
+        },
+        contact_number: {
+            type: 'string',
+            title: 'Contact Number'
+        },
+        email: {
+            type: 'string',
+            format: 'email',
+            title: 'Email'
+        },
+        preferred_days: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Preferred Days'
+        },
+        preferred_time: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Preferred Time'
+        },
+        reason: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Reason'
+        },
+        additional_info: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Additional Info'
+        },
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        booking_type: {
+            type: 'string',
+            enum: ['doctor', 'service', 'unknown'],
+            title: 'Booking Type'
+        },
+        status: {
+            '$ref': '#/components/schemas/RequestStatus'
+        },
+        status_message: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Status Message'
+        },
+        reschedule_reason: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Reschedule Reason'
+        },
+        submitted_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Submitted At'
+        },
+        updated_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Updated At'
+        },
+        specialist: {
+            anyOf: [
+                {
+                    '$ref': '#/components/schemas/SpecialistBasic'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        },
+        service: {
+            anyOf: [
+                {
+                    '$ref': '#/components/schemas/ServiceBasic'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        },
+        date: {
+            type: 'string',
+            title: 'Date'
+        },
+        time_slot: {
+            type: 'string',
+            title: 'Time Slot'
+        }
+    },
+    type: 'object',
+    required: ['specialisation_id', 'patient_name', 'contact_number', 'email', 'id', 'booking_type', 'status', 'submitted_at', 'date', 'time_slot'],
+    title: 'AppointmentRequestResponse'
+} as const;
+
+export const $AppointmentRequestStatusUpdate = {
+    properties: {
+        status: {
+            '$ref': '#/components/schemas/RequestStatus'
+        },
+        status_message: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Status Message'
+        }
+    },
+    type: 'object',
+    required: ['status'],
+    title: 'AppointmentRequestStatusUpdate'
+} as const;
+
+export const $AppointmentRescheduleRequest = {
+    properties: {
+        preferred_days: {
+            type: 'string',
+            title: 'Preferred Days'
+        },
+        preferred_time: {
+            type: 'string',
+            title: 'Preferred Time'
+        },
+        reason: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Reason'
+        }
+    },
+    type: 'object',
+    required: ['preferred_days', 'preferred_time'],
+    title: 'AppointmentRescheduleRequest'
 } as const;
 
 export const $AppointmentRow = {
@@ -971,6 +1316,230 @@ export const $BlockoffUpdate = {
     title: 'BlockoffUpdate'
 } as const;
 
+export const $Body_block_for_date_api_admin_services__service_id__block_post = {
+    properties: {
+        block_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Block Date'
+        }
+    },
+    type: 'object',
+    title: 'Body_block_for_date_api_admin_services__service_id__block_post'
+} as const;
+
+export const $Body_block_for_date_specialists__specialist_id__block_post = {
+    properties: {
+        block_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Block Date'
+        }
+    },
+    type: 'object',
+    title: 'Body_block_for_date_specialists__specialist_id__block_post'
+} as const;
+
+export const $Body_create_api_admin_services__post = {
+    properties: {
+        specialisation_id: {
+            type: 'integer',
+            title: 'Specialisation Id'
+        },
+        service_name: {
+            type: 'string',
+            title: 'Service Name'
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name'
+        },
+        consultation_fee: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Consultation Fee'
+        },
+        bio: {
+            type: 'string',
+            title: 'Bio',
+            default: ''
+        },
+        service_details: {
+            type: 'string',
+            title: 'Service Details',
+            default: ''
+        },
+        languages: {
+            type: 'string',
+            title: 'Languages',
+            default: ''
+        },
+        years_of_practice: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Years Of Practice'
+        },
+        hospital_affiliations: {
+            type: 'string',
+            title: 'Hospital Affiliations',
+            default: ''
+        },
+        board_certifications: {
+            type: 'string',
+            title: 'Board Certifications',
+            default: ''
+        },
+        awards: {
+            type: 'string',
+            title: 'Awards',
+            default: ''
+        },
+        insurance_tpa: {
+            type: 'string',
+            title: 'Insurance Tpa',
+            default: ''
+        },
+        insurance_shield_plan: {
+            type: 'string',
+            title: 'Insurance Shield Plan',
+            default: ''
+        },
+        contact_name: {
+            type: 'string',
+            title: 'Contact Name',
+            default: ''
+        },
+        contact_email: {
+            type: 'string',
+            title: 'Contact Email',
+            default: ''
+        },
+        contact_phone: {
+            type: 'string',
+            title: 'Contact Phone',
+            default: ''
+        },
+        cc_emails: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Cc Emails'
+        },
+        available_days: {
+            type: 'string',
+            title: 'Available Days',
+            default: ''
+        },
+        available_time_slots: {
+            type: 'string',
+            title: 'Available Time Slots',
+            default: ''
+        },
+        day_availability: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Day Availability'
+        },
+        blocked_dates: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Blocked Dates'
+        },
+        active: {
+            type: 'string',
+            title: 'Active',
+            default: 'true'
+        },
+        display_order: {
+            type: 'integer',
+            title: 'Display Order',
+            default: 0
+        },
+        image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image'
+        },
+        clinic_logo: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Clinic Logo'
+        },
+        banner_image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Image'
+        }
+    },
+    type: 'object',
+    required: ['specialisation_id', 'service_name', 'clinic_name'],
+    title: 'Body_create_api_admin_services__post'
+} as const;
+
 export const $Body_create_branch_api_admin_branches_post = {
     properties: {
         name: {
@@ -1047,7 +1616,7 @@ export const $Body_create_branch_api_admin_branches_post = {
             anyOf: [
                 {
                     type: 'string',
-                    format: 'binary'
+                    contentMediaType: 'application/octet-stream'
                 },
                 {
                     type: 'null'
@@ -1140,7 +1709,7 @@ export const $Body_create_onsite_branch_api_admin_appointments_v1_onsite_branch_
             anyOf: [
                 {
                     type: 'string',
-                    format: 'binary'
+                    contentMediaType: 'application/octet-stream'
                 },
                 {
                     type: 'null'
@@ -1221,6 +1790,261 @@ export const $Body_create_onsite_branch_api_admin_appointments_v1_onsite_branch_
     title: 'Body_create_onsite_branch_api_admin_appointments_v1_onsite_branch_post'
 } as const;
 
+export const $Body_create_specialisations__post = {
+    properties: {
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        slug: {
+            type: 'string',
+            title: 'Slug'
+        },
+        description: {
+            type: 'string',
+            title: 'Description',
+            default: ''
+        },
+        display_mode: {
+            type: 'string',
+            title: 'Display Mode',
+            default: 'doctors'
+        },
+        display_order: {
+            type: 'integer',
+            title: 'Display Order',
+            default: 0
+        },
+        active: {
+            type: 'string',
+            title: 'Active',
+            default: 'true'
+        },
+        icon: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Icon'
+        },
+        banner: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner'
+        }
+    },
+    type: 'object',
+    required: ['name', 'slug'],
+    title: 'Body_create_specialisations__post'
+} as const;
+
+export const $Body_create_specialists__post = {
+    properties: {
+        specialisation_id: {
+            type: 'integer',
+            title: 'Specialisation Id'
+        },
+        title: {
+            type: 'string',
+            title: 'Title',
+            default: ''
+        },
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        credentials: {
+            type: 'string',
+            title: 'Credentials',
+            default: ''
+        },
+        short_bio: {
+            type: 'string',
+            title: 'Short Bio',
+            default: ''
+        },
+        full_bio: {
+            type: 'string',
+            title: 'Full Bio',
+            default: ''
+        },
+        languages: {
+            type: 'string',
+            title: 'Languages',
+            default: ''
+        },
+        appointment_email: {
+            type: 'string',
+            title: 'Appointment Email'
+        },
+        contact_email: {
+            type: 'string',
+            title: 'Contact Email',
+            default: ''
+        },
+        contact_phone: {
+            type: 'string',
+            title: 'Contact Phone',
+            default: ''
+        },
+        available_days: {
+            type: 'string',
+            title: 'Available Days',
+            default: ''
+        },
+        available_time_slots: {
+            type: 'string',
+            title: 'Available Time Slots',
+            default: ''
+        },
+        day_availability: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Day Availability'
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name'
+        },
+        consultation_fee: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Consultation Fee'
+        },
+        years_of_practice: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Years Of Practice'
+        },
+        hospital_affiliations: {
+            type: 'string',
+            title: 'Hospital Affiliations',
+            default: ''
+        },
+        board_certifications: {
+            type: 'string',
+            title: 'Board Certifications',
+            default: ''
+        },
+        awards: {
+            type: 'string',
+            title: 'Awards',
+            default: ''
+        },
+        insurance_tpa: {
+            type: 'string',
+            title: 'Insurance Tpa',
+            default: ''
+        },
+        insurance_shield_plan: {
+            type: 'string',
+            title: 'Insurance Shield Plan',
+            default: ''
+        },
+        cc_emails: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Cc Emails'
+        },
+        display_order: {
+            type: 'integer',
+            title: 'Display Order',
+            default: 0
+        },
+        active: {
+            type: 'string',
+            title: 'Active',
+            default: 'true'
+        },
+        blocked_dates: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Blocked Dates'
+        },
+        image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image'
+        },
+        clinic_logo: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Clinic Logo'
+        },
+        banner_image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Image'
+        }
+    },
+    type: 'object',
+    required: ['specialisation_id', 'name', 'appointment_email', 'clinic_name'],
+    title: 'Body_create_specialists__post'
+} as const;
+
 export const $Body_dispatch_update_teleconsult_delivery_status_route_api_delivery_dispatch_update_delivery_status_put = {
     properties: {
         request_json: {
@@ -1231,7 +2055,7 @@ export const $Body_dispatch_update_teleconsult_delivery_status_route_api_deliver
             anyOf: [
                 {
                     type: 'string',
-                    format: 'binary'
+                    contentMediaType: 'application/octet-stream'
                 },
                 {
                     type: 'null'
@@ -1243,6 +2067,250 @@ export const $Body_dispatch_update_teleconsult_delivery_status_route_api_deliver
     type: 'object',
     required: ['request_json'],
     title: 'Body_dispatch_update_teleconsult_delivery_status_route_api_delivery_dispatch_update_delivery_status_put'
+} as const;
+
+export const $Body_unblock_for_date_api_admin_services__service_id__unblock_post = {
+    properties: {
+        block_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Block Date'
+        }
+    },
+    type: 'object',
+    title: 'Body_unblock_for_date_api_admin_services__service_id__unblock_post'
+} as const;
+
+export const $Body_unblock_for_date_specialists__specialist_id__unblock_post = {
+    properties: {
+        block_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Block Date'
+        }
+    },
+    type: 'object',
+    title: 'Body_unblock_for_date_specialists__specialist_id__unblock_post'
+} as const;
+
+export const $Body_update_api_admin_services__service_id__patch = {
+    properties: {
+        specialisation_id: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Specialisation Id'
+        },
+        service_name: {
+            type: 'string',
+            title: 'Service Name',
+            default: ''
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name',
+            default: ''
+        },
+        consultation_fee: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Consultation Fee'
+        },
+        bio: {
+            type: 'string',
+            title: 'Bio',
+            default: ''
+        },
+        service_details: {
+            type: 'string',
+            title: 'Service Details',
+            default: ''
+        },
+        languages: {
+            type: 'string',
+            title: 'Languages',
+            default: ''
+        },
+        years_of_practice: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Years Of Practice'
+        },
+        hospital_affiliations: {
+            type: 'string',
+            title: 'Hospital Affiliations',
+            default: ''
+        },
+        board_certifications: {
+            type: 'string',
+            title: 'Board Certifications',
+            default: ''
+        },
+        awards: {
+            type: 'string',
+            title: 'Awards',
+            default: ''
+        },
+        insurance_tpa: {
+            type: 'string',
+            title: 'Insurance Tpa',
+            default: ''
+        },
+        insurance_shield_plan: {
+            type: 'string',
+            title: 'Insurance Shield Plan',
+            default: ''
+        },
+        contact_name: {
+            type: 'string',
+            title: 'Contact Name',
+            default: ''
+        },
+        contact_email: {
+            type: 'string',
+            title: 'Contact Email',
+            default: ''
+        },
+        contact_phone: {
+            type: 'string',
+            title: 'Contact Phone',
+            default: ''
+        },
+        cc_emails: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Cc Emails'
+        },
+        available_days: {
+            type: 'string',
+            title: 'Available Days',
+            default: ''
+        },
+        available_time_slots: {
+            type: 'string',
+            title: 'Available Time Slots',
+            default: ''
+        },
+        day_availability: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Day Availability'
+        },
+        blocked_dates: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Blocked Dates'
+        },
+        active: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Active'
+        },
+        display_order: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Display Order'
+        },
+        image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image'
+        },
+        clinic_logo: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Clinic Logo'
+        },
+        banner_image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Image'
+        }
+    },
+    type: 'object',
+    title: 'Body_update_api_admin_services__service_id__patch'
 } as const;
 
 export const $Body_update_branch_api_admin_branches__branch_id__put = {
@@ -1287,7 +2355,7 @@ export const $Body_update_branch_api_admin_branches__branch_id__put = {
             anyOf: [
                 {
                     type: 'string',
-                    format: 'binary'
+                    contentMediaType: 'application/octet-stream'
                 },
                 {
                     type: 'null'
@@ -1399,7 +2467,7 @@ export const $Body_update_onsite_branch_api_admin_appointments_v1_onsite_branche
             anyOf: [
                 {
                     type: 'string',
-                    format: 'binary'
+                    contentMediaType: 'application/octet-stream'
                 },
                 {
                     type: 'null'
@@ -1494,11 +2562,306 @@ export const $Body_update_onsite_branch_api_admin_appointments_v1_onsite_branche
     title: 'Body_update_onsite_branch_api_admin_appointments_v1_onsite_branches__onsite_id__put'
 } as const;
 
+export const $Body_update_specialisations__specialisation_id__patch = {
+    properties: {
+        name: {
+            type: 'string',
+            title: 'Name',
+            default: ''
+        },
+        slug: {
+            type: 'string',
+            title: 'Slug',
+            default: ''
+        },
+        description: {
+            type: 'string',
+            title: 'Description',
+            default: ''
+        },
+        display_mode: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Display Mode'
+        },
+        display_order: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Display Order'
+        },
+        active: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Active'
+        },
+        icon: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Icon'
+        },
+        banner: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner'
+        }
+    },
+    type: 'object',
+    title: 'Body_update_specialisations__specialisation_id__patch'
+} as const;
+
+export const $Body_update_specialists__specialist_id__patch = {
+    properties: {
+        specialisation_id: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Specialisation Id'
+        },
+        title: {
+            type: 'string',
+            title: 'Title',
+            default: ''
+        },
+        name: {
+            type: 'string',
+            title: 'Name',
+            default: ''
+        },
+        credentials: {
+            type: 'string',
+            title: 'Credentials',
+            default: ''
+        },
+        short_bio: {
+            type: 'string',
+            title: 'Short Bio',
+            default: ''
+        },
+        full_bio: {
+            type: 'string',
+            title: 'Full Bio',
+            default: ''
+        },
+        languages: {
+            type: 'string',
+            title: 'Languages',
+            default: ''
+        },
+        appointment_email: {
+            type: 'string',
+            title: 'Appointment Email',
+            default: ''
+        },
+        contact_email: {
+            type: 'string',
+            title: 'Contact Email',
+            default: ''
+        },
+        contact_phone: {
+            type: 'string',
+            title: 'Contact Phone',
+            default: ''
+        },
+        available_days: {
+            type: 'string',
+            title: 'Available Days',
+            default: ''
+        },
+        available_time_slots: {
+            type: 'string',
+            title: 'Available Time Slots',
+            default: ''
+        },
+        day_availability: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Day Availability'
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name',
+            default: ''
+        },
+        consultation_fee: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Consultation Fee'
+        },
+        years_of_practice: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Years Of Practice'
+        },
+        hospital_affiliations: {
+            type: 'string',
+            title: 'Hospital Affiliations',
+            default: ''
+        },
+        board_certifications: {
+            type: 'string',
+            title: 'Board Certifications',
+            default: ''
+        },
+        awards: {
+            type: 'string',
+            title: 'Awards',
+            default: ''
+        },
+        insurance_tpa: {
+            type: 'string',
+            title: 'Insurance Tpa',
+            default: ''
+        },
+        insurance_shield_plan: {
+            type: 'string',
+            title: 'Insurance Shield Plan',
+            default: ''
+        },
+        cc_emails: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Cc Emails'
+        },
+        display_order: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Display Order'
+        },
+        active: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Active'
+        },
+        blocked_dates: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Blocked Dates'
+        },
+        image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image'
+        },
+        clinic_logo: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Clinic Logo'
+        },
+        banner_image: {
+            anyOf: [
+                {
+                    type: 'string',
+                    contentMediaType: 'application/octet-stream'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Image'
+        }
+    },
+    type: 'object',
+    title: 'Body_update_specialists__specialist_id__patch'
+} as const;
+
 export const $Body_upload_corporate_users_api_admin_corporate_users_upload_post = {
     properties: {
         file: {
             type: 'string',
-            format: 'binary',
+            contentMediaType: 'application/octet-stream',
             title: 'File'
         }
     },
@@ -1511,7 +2874,7 @@ export const $Body_upload_table_api_admin_st_andrew_upload_post = {
     properties: {
         file: {
             type: 'string',
-            format: 'binary',
+            contentMediaType: 'application/octet-stream',
             title: 'File'
         }
     },
@@ -1670,6 +3033,7 @@ export const $BranchItem = {
                 {
                     additionalProperties: {
                         items: {
+                            additionalProperties: true,
                             type: 'object'
                         },
                         type: 'array'
@@ -1848,6 +3212,7 @@ export const $BranchOperatingHoursResponse = {
         operating_hours: {
             additionalProperties: {
                 items: {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 type: 'array'
@@ -1963,6 +3328,33 @@ export const $BranchSelectOption = {
     title: 'BranchSelectOption'
 } as const;
 
+export const $BranchSessionCapacityResponse = {
+    properties: {
+        branch_id: {
+            type: 'string',
+            title: 'Branch Id'
+        },
+        branch_name: {
+            type: 'string',
+            title: 'Branch Name'
+        },
+        date: {
+            type: 'string',
+            title: 'Date'
+        },
+        slots: {
+            items: {
+                '$ref': '#/components/schemas/SessionSlotCapacity'
+            },
+            type: 'array',
+            title: 'Slots'
+        }
+    },
+    type: 'object',
+    required: ['branch_id', 'branch_name', 'date', 'slots'],
+    title: 'BranchSessionCapacityResponse'
+} as const;
+
 export const $BranchType = {
     type: 'string',
     enum: ['main', 'onsite'],
@@ -2013,6 +3405,165 @@ export const $CalendarListResponse = {
     type: 'object',
     required: ['calendars'],
     title: 'CalendarListResponse'
+} as const;
+
+export const $CampaignCreateReq = {
+    properties: {
+        type: {
+            type: 'string',
+            title: 'Type',
+            description: 'consent_notice | marketing | system'
+        },
+        title: {
+            type: 'string',
+            maxLength: 120,
+            minLength: 1,
+            title: 'Title',
+            description: 'Notification header'
+        },
+        body: {
+            type: 'string',
+            maxLength: 500,
+            minLength: 1,
+            title: 'Body',
+            description: 'Notification message'
+        },
+        data: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Data',
+            description: 'e.g. {"pathname": "/profile/notification-settings"}',
+            default: {
+                pathname: '/profile/notification-settings'
+            }
+        }
+    },
+    type: 'object',
+    required: ['type', 'title', 'body'],
+    title: 'CampaignCreateReq'
+} as const;
+
+export const $CampaignListResp = {
+    properties: {
+        rows: {
+            items: {
+                '$ref': '#/components/schemas/CampaignRow'
+            },
+            type: 'array',
+            title: 'Rows'
+        }
+    },
+    type: 'object',
+    required: ['rows'],
+    title: 'CampaignListResp'
+} as const;
+
+export const $CampaignRow = {
+    properties: {
+        id: {
+            type: 'string',
+            title: 'Id'
+        },
+        type: {
+            type: 'string',
+            title: 'Type'
+        },
+        title: {
+            type: 'string',
+            title: 'Title'
+        },
+        body: {
+            type: 'string',
+            title: 'Body'
+        },
+        data: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Data'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        total_recipients: {
+            type: 'integer',
+            title: 'Total Recipients'
+        },
+        sent_count: {
+            type: 'integer',
+            title: 'Sent Count'
+        },
+        failed_count: {
+            type: 'integer',
+            title: 'Failed Count'
+        },
+        skipped_count: {
+            type: 'integer',
+            title: 'Skipped Count'
+        },
+        pending_count: {
+            type: 'integer',
+            title: 'Pending Count'
+        },
+        delivered_count: {
+            type: 'integer',
+            title: 'Delivered Count'
+        },
+        undelivered_count: {
+            type: 'integer',
+            title: 'Undelivered Count'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        started_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Started At'
+        },
+        completed_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Completed At'
+        }
+    },
+    type: 'object',
+    required: ['id', 'type', 'title', 'body', 'data', 'status', 'total_recipients', 'sent_count', 'failed_count', 'skipped_count', 'pending_count', 'delivered_count', 'undelivered_count', 'created_at', 'started_at', 'completed_at'],
+    title: 'CampaignRow'
 } as const;
 
 export const $CancelParams = {
@@ -2074,6 +3625,7 @@ export const $CheckPaymentSuccessResp = {
             title: 'Redirect Url'
         },
         redirect_params: {
+            additionalProperties: true,
             type: 'object',
             title: 'Redirect Params'
         }
@@ -2128,11 +3680,13 @@ export const $CorporateCodeCreate = {
             title: 'Organization'
         },
         patient_survey: {
+            additionalProperties: true,
             type: 'object',
             title: 'Patient Survey',
             default: {}
         },
         corporate_survey: {
+            additionalProperties: true,
             type: 'object',
             title: 'Corporate Survey',
             default: {}
@@ -2174,6 +3728,28 @@ export const $CorporateCodeCreate = {
         category: {
             '$ref': '#/components/schemas/AppointmentCategory',
             default: 'general'
+        },
+        max_appointments_total: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Total'
+        },
+        max_appointments_per_day: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Per Day'
         },
         service_group_ids: {
             items: {
@@ -2208,11 +3784,13 @@ export const $CorporateCodeDetails = {
             title: 'Organization'
         },
         patient_survey: {
+            additionalProperties: true,
             type: 'object',
             title: 'Patient Survey',
             default: {}
         },
         corporate_survey: {
+            additionalProperties: true,
             type: 'object',
             title: 'Corporate Survey',
             default: {}
@@ -2255,6 +3833,28 @@ export const $CorporateCodeDetails = {
             '$ref': '#/components/schemas/AppointmentCategory',
             default: 'general'
         },
+        max_appointments_total: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Total'
+        },
+        max_appointments_per_day: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Per Day'
+        },
         id: {
             type: 'string',
             title: 'Id'
@@ -2287,6 +3887,107 @@ export const $CorporateCodeDetails = {
     type: 'object',
     required: ['code', 'organization', 'id', 'service_groups', 'onsite_branches', 'created_at', 'updated_at'],
     title: 'CorporateCodeDetails'
+} as const;
+
+export const $CorporateCodeOverrideInfo = {
+    properties: {
+        corporate_code_id: {
+            type: 'string',
+            title: 'Corporate Code Id'
+        },
+        inventory_item_ids: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Inventory Item Ids',
+            default: []
+        },
+        inventory_items: {
+            items: {
+                '$ref': '#/components/schemas/InventoryItemInfo'
+            },
+            type: 'array',
+            title: 'Inventory Items',
+            default: []
+        }
+    },
+    type: 'object',
+    required: ['corporate_code_id'],
+    title: 'CorporateCodeOverrideInfo',
+    description: 'Full details for a corporate code override including inventory item info.'
+} as const;
+
+export const $CorporateCodeQuotaUsage = {
+    properties: {
+        corporate_code_id: {
+            type: 'string',
+            title: 'Corporate Code Id'
+        },
+        code: {
+            type: 'string',
+            title: 'Code'
+        },
+        organization: {
+            type: 'string',
+            title: 'Organization'
+        },
+        max_appointments_total: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Total'
+        },
+        max_appointments_per_day: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Per Day'
+        },
+        total_appointments_used: {
+            type: 'integer',
+            title: 'Total Appointments Used'
+        },
+        today_appointments_used: {
+            type: 'integer',
+            title: 'Today Appointments Used'
+        },
+        quota_remaining_total: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Quota Remaining Total'
+        },
+        quota_remaining_today: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Quota Remaining Today'
+        }
+    },
+    type: 'object',
+    required: ['corporate_code_id', 'code', 'organization', 'max_appointments_total', 'max_appointments_per_day', 'total_appointments_used', 'today_appointments_used', 'quota_remaining_total', 'quota_remaining_today'],
+    title: 'CorporateCodeQuotaUsage'
 } as const;
 
 export const $CorporateCodeResp = {
@@ -2379,6 +4080,7 @@ export const $CorporateCodeUpdate = {
         patient_survey: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -2390,6 +4092,7 @@ export const $CorporateCodeUpdate = {
         corporate_survey: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -2471,6 +4174,28 @@ export const $CorporateCodeUpdate = {
                 }
             ],
             title: 'Onsite Branches'
+        },
+        max_appointments_total: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Total'
+        },
+        max_appointments_per_day: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Per Day'
         }
     },
     type: 'object',
@@ -2615,6 +4340,7 @@ export const $CreateAccountReq = {
 export const $CreatePostpaymentResp = {
     properties: {
         payment_provider_params: {
+            additionalProperties: true,
             type: 'object',
             title: 'Payment Provider Params'
         },
@@ -2746,6 +4472,7 @@ export const $CsvUploadResponse = {
         },
         failed_records: {
             items: {
+                additionalProperties: true,
                 type: 'object'
             },
             type: 'array',
@@ -3215,6 +4942,14 @@ export const $DynamicPricingRow = {
             type: 'object',
             title: 'Corporate Code Overrides',
             default: {}
+        },
+        corporate_code_override_details: {
+            items: {
+                '$ref': '#/components/schemas/CorporateCodeOverrideInfo'
+            },
+            type: 'array',
+            title: 'Corporate Code Override Details',
+            default: []
         }
     },
     type: 'object',
@@ -3300,6 +5035,167 @@ export const $ElapsedTimeResp = {
     type: 'object',
     required: ['elapsed_time'],
     title: 'ElapsedTimeResp'
+} as const;
+
+export const $EmailTemplateCreate = {
+    properties: {
+        label: {
+            type: 'string',
+            title: 'Label'
+        },
+        subject: {
+            type: 'string',
+            title: 'Subject'
+        },
+        body_html: {
+            type: 'string',
+            title: 'Body Html'
+        },
+        body_text: {
+            type: 'string',
+            title: 'Body Text'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        template_key: {
+            type: 'string',
+            title: 'Template Key'
+        }
+    },
+    type: 'object',
+    required: ['label', 'subject', 'body_html', 'body_text', 'template_key'],
+    title: 'EmailTemplateCreate'
+} as const;
+
+export const $EmailTemplateResponse = {
+    properties: {
+        label: {
+            type: 'string',
+            title: 'Label'
+        },
+        subject: {
+            type: 'string',
+            title: 'Subject'
+        },
+        body_html: {
+            type: 'string',
+            title: 'Body Html'
+        },
+        body_text: {
+            type: 'string',
+            title: 'Body Text'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        template_key: {
+            type: 'string',
+            title: 'Template Key'
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
+        },
+        updated_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Updated At'
+        }
+    },
+    type: 'object',
+    required: ['label', 'subject', 'body_html', 'body_text', 'id', 'template_key', 'created_at'],
+    title: 'EmailTemplateResponse'
+} as const;
+
+export const $EmailTemplateUpdate = {
+    properties: {
+        label: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Label'
+        },
+        subject: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Subject'
+        },
+        body_html: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Body Html'
+        },
+        body_text: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Body Text'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        }
+    },
+    type: 'object',
+    title: 'EmailTemplateUpdate'
 } as const;
 
 export const $FamilyDetails = {
@@ -3755,6 +5651,7 @@ export const $GetPriceBreakdownReq = {
         patient_survey: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -3766,6 +5663,7 @@ export const $GetPriceBreakdownReq = {
         corporate_survey: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -4706,6 +6604,17 @@ export const $OperatingHourCreate = {
             title: 'Max Bookings',
             default: 1
         },
+        max_appointments_per_session: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Per Session'
+        },
         branch_id: {
             type: 'string',
             title: 'Branch Id'
@@ -4879,10 +6788,12 @@ export const $PatientDetailsDiff = {
             title: 'Nric'
         },
         app: {
+            additionalProperties: true,
             type: 'object',
             title: 'App'
         },
         sgimed: {
+            additionalProperties: true,
             type: 'object',
             title: 'Sgimed'
         }
@@ -4954,6 +6865,89 @@ export const $PatientInfo = {
     type: 'object',
     required: ['type'],
     title: 'PatientInfo'
+} as const;
+
+export const $PatientPreferenceListResp = {
+    properties: {
+        total: {
+            type: 'integer',
+            title: 'Total'
+        },
+        rows: {
+            items: {
+                '$ref': '#/components/schemas/PatientPreferenceRow'
+            },
+            type: 'array',
+            title: 'Rows'
+        }
+    },
+    type: 'object',
+    required: ['total', 'rows'],
+    title: 'PatientPreferenceListResp'
+} as const;
+
+export const $PatientPreferenceRow = {
+    properties: {
+        account_id: {
+            type: 'string',
+            title: 'Account Id'
+        },
+        name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Name'
+        },
+        mobile: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Mobile'
+        },
+        enable_notifications: {
+            type: 'boolean',
+            title: 'Enable Notifications'
+        },
+        marketing_opt_in: {
+            type: 'boolean',
+            title: 'Marketing Opt In'
+        },
+        opted_out_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Opted Out At'
+        },
+        opt_out_source: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Opt Out Source'
+        }
+    },
+    type: 'object',
+    required: ['account_id', 'name', 'mobile', 'enable_notifications', 'marketing_opt_in', 'opted_out_at', 'opt_out_source'],
+    title: 'PatientPreferenceRow'
 } as const;
 
 export const $PatientType = {
@@ -5053,6 +7047,7 @@ export const $PaymentInquiryResp = {
             title: 'Redirect Pathname'
         },
         redirect_params: {
+            additionalProperties: true,
             type: 'object',
             title: 'Redirect Params'
         }
@@ -5132,6 +7127,7 @@ export const $PaymentMethodsResp = {
 export const $PaymentResp = {
     properties: {
         payment_provider_params: {
+            additionalProperties: true,
             type: 'object',
             title: 'Payment Provider Params'
         },
@@ -5166,6 +7162,51 @@ export const $PhoneCountryCode = {
     type: 'string',
     enum: ['+44', '+1', '+213', '+376', '+244', '+1264', '+1268', '+54', '+374', '+297', '+61', '+43', '+994', '+1242', '+973', '+880', '+1246', '+375', '+32', '+501', '+229', '+1441', '+975', '+591', '+387', '+267', '+55', '+673', '+359', '+226', '+257', '+855', '+237', '+1', '+238', '+1345', '+236', '+56', '+86', '+57', '+269', '+242', '+682', '+506', '+385', '+53', '+90392', '+357', '+42', '+45', '+253', '+1809', '+1809', '+593', '+20', '+503', '+240', '+291', '+372', '+251', '+500', '+298', '+679', '+358', '+33', '+594', '+689', '+241', '+220', '+7880', '+49', '+233', '+350', '+30', '+299', '+1473', '+590', '+671', '+502', '+224', '+245', '+592', '+509', '+504', '+852', '+36', '+354', '+91', '+62', '+98', '+964', '+353', '+972', '+39', '+1876', '+81', '+962', '+7', '+254', '+686', '+850', '+82', '+965', '+996', '+856', '+371', '+961', '+266', '+231', '+218', '+417', '+370', '+352', '+853', '+389', '+261', '+265', '+60', '+960', '+223', '+356', '+692', '+596', '+222', '+230', '+269', '+52', '+691', '+373', '+377', '+976', '+1664', '+212', '+258', '+95', '+264', '+674', '+977', '+31', '+687', '+64', '+505', '+227', '+234', '+683', '+672', '+670', '+47', '+968', '+680', '+507', '+675', '+595', '+51', '+63', '+48', '+351', '+1787', '+974', '+262', '+40', '+7', '+250', '+378', '+239', '+966', '+221', '+381', '+248', '+232', '+65', '+421', '+386', '+677', '+252', '+27', '+34', '+94', '+290', '+1869', '+1758', '+249', '+597', '+268', '+46', '+41', '+963', '+886', '+7', '+66', '+228', '+676', '+1868', '+216', '+90', '+7', '+993', '+1649', '+688', '+256', '+380', '+971', '+598', '+7', '+678', '+379', '+58', '+84', '+1284', '+1340', '+681', '+969', '+967', '+260', '+263'],
     title: 'PhoneCountryCode'
+} as const;
+
+export const $PreferenceResp = {
+    properties: {
+        enable_notifications: {
+            type: 'boolean',
+            title: 'Enable Notifications'
+        },
+        marketing_opt_in: {
+            type: 'boolean',
+            title: 'Marketing Opt In'
+        }
+    },
+    type: 'object',
+    required: ['enable_notifications', 'marketing_opt_in'],
+    title: 'PreferenceResp'
+} as const;
+
+export const $PreferenceUpdateReq = {
+    properties: {
+        enable_notifications: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Enable Notifications'
+        },
+        marketing_opt_in: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Marketing Opt In'
+        }
+    },
+    type: 'object',
+    title: 'PreferenceUpdateReq'
 } as const;
 
 export const $PrepaymentRateReq = {
@@ -5274,10 +7315,23 @@ export const $ProfileParams = {
         },
         gender: {
             '$ref': '#/components/schemas/SGiMedGender'
+        },
+        patient_type: {
+            '$ref': '#/components/schemas/PatientType'
+        },
+        enable_notifications: {
+            type: 'boolean',
+            title: 'Enable Notifications',
+            default: true
+        },
+        marketing_opt_in: {
+            type: 'boolean',
+            title: 'Marketing Opt In',
+            default: true
         }
     },
     type: 'object',
-    required: ['ic_type', 'nric', 'name', 'date_of_birth', 'nationality', 'language', 'gender'],
+    required: ['ic_type', 'nric', 'name', 'date_of_birth', 'nationality', 'language', 'gender', 'patient_type'],
     title: 'ProfileParams'
 } as const;
 
@@ -5392,6 +7446,126 @@ export const $PushTokenReq = {
     title: 'PushTokenReq'
 } as const;
 
+export const $RecipientListResp = {
+    properties: {
+        total: {
+            type: 'integer',
+            title: 'Total'
+        },
+        rows: {
+            items: {
+                '$ref': '#/components/schemas/RecipientRow'
+            },
+            type: 'array',
+            title: 'Rows'
+        }
+    },
+    type: 'object',
+    required: ['total', 'rows'],
+    title: 'RecipientListResp'
+} as const;
+
+export const $RecipientRow = {
+    properties: {
+        account_id: {
+            type: 'string',
+            title: 'Account Id'
+        },
+        name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Name'
+        },
+        mobile: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Mobile'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        attempts: {
+            type: 'integer',
+            title: 'Attempts'
+        },
+        last_error: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Last Error'
+        },
+        sent_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Sent At'
+        },
+        delivery: {
+            type: 'string',
+            title: 'Delivery'
+        },
+        receipt_status: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Receipt Status'
+        },
+        receipt_error: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Receipt Error'
+        },
+        receipt_checked_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Receipt Checked At'
+        }
+    },
+    type: 'object',
+    required: ['account_id', 'name', 'mobile', 'status', 'attempts', 'last_error', 'sent_at', 'delivery', 'receipt_status', 'receipt_error', 'receipt_checked_at'],
+    title: 'RecipientRow'
+} as const;
+
 export const $RedisAuthState = {
     type: 'string',
     enum: ['verify_otp', 'verify_dob', 'register', 'logged_in', 'change_mobile'],
@@ -5449,6 +7623,28 @@ export const $RegenerateHealthReportResponse = {
         reports_regenerated: {
             type: 'integer',
             title: 'Reports Regenerated'
+        },
+        measurements_fetched: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Measurements Fetched'
+        },
+        measurements_created: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Measurements Created'
         }
     },
     type: 'object',
@@ -5481,6 +7677,16 @@ export const $RegisterInput = {
         },
         gender: {
             '$ref': '#/components/schemas/SGiMedGender'
+        },
+        enable_notifications: {
+            type: 'boolean',
+            title: 'Enable Notifications',
+            default: true
+        },
+        marketing_opt_in: {
+            type: 'boolean',
+            title: 'Marketing Opt In',
+            default: true
         }
     },
     type: 'object',
@@ -5547,6 +7753,12 @@ export const $ReportSummaryResp = {
     type: 'object',
     required: ['id', 'created_at', 'warnings', 'results', 'lab_reports'],
     title: 'ReportSummaryResp'
+} as const;
+
+export const $RequestStatus = {
+    type: 'string',
+    enum: ['requested', 'confirmed', 'rejected', 'completed', 'rescheduled', 'cancelled'],
+    title: 'RequestStatus'
 } as const;
 
 export const $RescheduleAppointmentReq = {
@@ -5700,6 +7912,26 @@ export const $SelectOption = {
     type: 'object',
     required: ['value', 'label'],
     title: 'SelectOption'
+} as const;
+
+export const $ServiceBasic = {
+    properties: {
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        service_name: {
+            type: 'string',
+            title: 'Service Name'
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name'
+        }
+    },
+    type: 'object',
+    required: ['id', 'service_name', 'clinic_name'],
+    title: 'ServiceBasic'
 } as const;
 
 export const $ServiceCreate = {
@@ -5968,6 +8200,22 @@ export const $ServiceGroupCreate = {
             title: 'Restricted Branches',
             default: []
         },
+        available_days: {
+            items: {
+                '$ref': '#/components/schemas/DayOfWeek'
+            },
+            type: 'array',
+            title: 'Available Days',
+            default: []
+        },
+        available_time_slots: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Available Time Slots',
+            default: []
+        },
         corporate_code_id: {
             anyOf: [
                 {
@@ -6034,6 +8282,22 @@ export const $ServiceGroupDetails = {
             },
             type: 'array',
             title: 'Restricted Branches',
+            default: []
+        },
+        available_days: {
+            items: {
+                '$ref': '#/components/schemas/DayOfWeek'
+            },
+            type: 'array',
+            title: 'Available Days',
+            default: []
+        },
+        available_time_slots: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Available Time Slots',
             default: []
         },
         corporate_code_id: {
@@ -6191,6 +8455,34 @@ export const $ServiceGroupUpdate = {
             ],
             title: 'Restricted Branches'
         },
+        available_days: {
+            anyOf: [
+                {
+                    items: {
+                        '$ref': '#/components/schemas/DayOfWeek'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Days'
+        },
+        available_time_slots: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Time Slots'
+        },
         corporate_code_id: {
             anyOf: [
                 {
@@ -6282,6 +8574,316 @@ export const $ServiceResp = {
     type: 'object',
     required: ['services'],
     title: 'ServiceResp'
+} as const;
+
+export const $ServiceResponse = {
+    properties: {
+        specialisation_id: {
+            type: 'integer',
+            title: 'Specialisation Id'
+        },
+        service_name: {
+            type: 'string',
+            title: 'Service Name'
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name'
+        },
+        consultation_fee: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Consultation Fee'
+        },
+        image_url: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image Url'
+        },
+        clinic_logo_path: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Clinic Logo Path'
+        },
+        banner_image_path: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Image Path'
+        },
+        bio: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Bio'
+        },
+        service_details: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Service Details'
+        },
+        languages: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Languages'
+        },
+        years_of_practice: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Years Of Practice'
+        },
+        hospital_affiliations: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Hospital Affiliations'
+        },
+        board_certifications: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Board Certifications'
+        },
+        awards: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Awards'
+        },
+        insurance_tpa: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Insurance Tpa'
+        },
+        insurance_shield_plan: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Insurance Shield Plan'
+        },
+        contact_name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Name'
+        },
+        contact_email: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'email'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Email'
+        },
+        contact_phone: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Phone'
+        },
+        cc_emails: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Cc Emails'
+        },
+        available_days: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Days'
+        },
+        available_time_slots: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Time Slots'
+        },
+        day_availability: {
+            anyOf: [
+                {
+                    additionalProperties: {
+                        items: {
+                            type: 'string'
+                        },
+                        type: 'array'
+                    },
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Day Availability'
+        },
+        active: {
+            type: 'boolean',
+            title: 'Active',
+            default: true
+        },
+        display_order: {
+            type: 'integer',
+            title: 'Display Order',
+            default: 0
+        },
+        blocked_dates: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Blocked Dates'
+        },
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        blocked_today: {
+            type: 'boolean',
+            title: 'Blocked Today',
+            default: false
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
+        },
+        updated_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Updated At'
+        },
+        specialisation: {
+            anyOf: [
+                {
+                    '$ref': '#/components/schemas/SpecialisationBasic'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        }
+    },
+    type: 'object',
+    required: ['specialisation_id', 'service_name', 'clinic_name', 'id', 'created_at'],
+    title: 'ServiceResponse'
 } as const;
 
 export const $ServiceUpdate = {
@@ -6395,6 +8997,60 @@ export const $ServiceUpdate = {
     title: 'ServiceUpdate'
 } as const;
 
+export const $SessionSlotCapacity = {
+    properties: {
+        slot_id: {
+            type: 'string',
+            title: 'Slot Id'
+        },
+        day: {
+            type: 'string',
+            title: 'Day'
+        },
+        start_time: {
+            type: 'string',
+            title: 'Start Time'
+        },
+        end_time: {
+            type: 'string',
+            title: 'End Time'
+        },
+        max_appointments_per_session: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Appointments Per Session'
+        },
+        booked_count: {
+            type: 'integer',
+            title: 'Booked Count'
+        },
+        available: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available'
+        },
+        is_full: {
+            type: 'boolean',
+            title: 'Is Full'
+        }
+    },
+    type: 'object',
+    required: ['slot_id', 'day', 'start_time', 'end_time', 'max_appointments_per_session', 'booked_count', 'available', 'is_full'],
+    title: 'SessionSlotCapacity'
+} as const;
+
 export const $SetDefaultPaymentMethodReq = {
     properties: {
         payment_method: {
@@ -6430,6 +9086,504 @@ export const $SignedURLResponse = {
     type: 'object',
     required: ['url', 'filetype'],
     title: 'SignedURLResponse'
+} as const;
+
+export const $SpecialisationBasic = {
+    properties: {
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        slug: {
+            type: 'string',
+            title: 'Slug'
+        }
+    },
+    type: 'object',
+    required: ['id', 'name', 'slug'],
+    title: 'SpecialisationBasic'
+} as const;
+
+export const $SpecialisationResponse = {
+    properties: {
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        slug: {
+            type: 'string',
+            title: 'Slug'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        icon_url: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Icon Url'
+        },
+        banner_url: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Url'
+        },
+        display_mode: {
+            type: 'string',
+            enum: ['doctors', 'services'],
+            title: 'Display Mode',
+            default: 'doctors'
+        },
+        display_order: {
+            type: 'integer',
+            title: 'Display Order',
+            default: 0
+        },
+        active: {
+            type: 'boolean',
+            title: 'Active',
+            default: true
+        },
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
+        },
+        updated_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Updated At'
+        },
+        specialists: {
+            anyOf: [
+                {
+                    items: {
+                        '$ref': '#/components/schemas/SpecialistResponse'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Specialists'
+        },
+        services: {
+            anyOf: [
+                {
+                    items: {
+                        '$ref': '#/components/schemas/ServiceResponse'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Services'
+        }
+    },
+    type: 'object',
+    required: ['name', 'slug', 'id', 'created_at'],
+    title: 'SpecialisationResponse'
+} as const;
+
+export const $SpecialistBasic = {
+    properties: {
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        title: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Title'
+        },
+        image_url: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image Url'
+        }
+    },
+    type: 'object',
+    required: ['id', 'name'],
+    title: 'SpecialistBasic'
+} as const;
+
+export const $SpecialistResponse = {
+    properties: {
+        specialisation_id: {
+            type: 'integer',
+            title: 'Specialisation Id'
+        },
+        title: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Title'
+        },
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        image_url: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image Url'
+        },
+        credentials: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Credentials'
+        },
+        short_bio: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Short Bio'
+        },
+        full_bio: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Full Bio'
+        },
+        languages: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Languages'
+        },
+        appointment_email: {
+            type: 'string',
+            format: 'email',
+            title: 'Appointment Email'
+        },
+        contact_email: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'email'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Email'
+        },
+        contact_phone: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Phone'
+        },
+        available_days: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Days'
+        },
+        available_time_slots: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Time Slots'
+        },
+        day_availability: {
+            anyOf: [
+                {
+                    additionalProperties: {
+                        items: {
+                            type: 'string'
+                        },
+                        type: 'array'
+                    },
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Day Availability'
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name'
+        },
+        clinic_logo_path: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Clinic Logo Path'
+        },
+        banner_image_path: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Image Path'
+        },
+        consultation_fee: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Consultation Fee'
+        },
+        years_of_practice: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Years Of Practice'
+        },
+        hospital_affiliations: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Hospital Affiliations'
+        },
+        board_certifications: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Board Certifications'
+        },
+        awards: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Awards'
+        },
+        insurance_tpa: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Insurance Tpa'
+        },
+        insurance_shield_plan: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Insurance Shield Plan'
+        },
+        cc_emails: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Cc Emails'
+        },
+        display_order: {
+            type: 'integer',
+            title: 'Display Order',
+            default: 0
+        },
+        active: {
+            type: 'boolean',
+            title: 'Active',
+            default: true
+        },
+        blocked_dates: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Blocked Dates'
+        },
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        blocked_today: {
+            type: 'boolean',
+            title: 'Blocked Today',
+            default: false
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
+        },
+        updated_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Updated At'
+        },
+        specialisation: {
+            anyOf: [
+                {
+                    '$ref': '#/components/schemas/SpecialisationBasic'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        }
+    },
+    type: 'object',
+    required: ['specialisation_id', 'name', 'appointment_email', 'clinic_name', 'id', 'created_at'],
+    title: 'SpecialistResponse'
 } as const;
 
 export const $StAndrewMetadataResp = {
@@ -6614,6 +9768,7 @@ export const $TeleconsultDeliveryResponse = {
         },
         dispatch_history: {
             items: {
+                additionalProperties: true,
                 type: 'object'
             },
             type: 'array',
@@ -6784,6 +9939,7 @@ export const $TeleconsultPaymentResp = {
         remarks: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -7042,6 +10198,359 @@ export const $ToggleNotificationsParams = {
     title: 'ToggleNotificationsParams'
 } as const;
 
+export const $UnifiedServiceResponse = {
+    properties: {
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        type: {
+            type: 'string',
+            enum: ['service', 'specialist'],
+            title: 'Type'
+        },
+        specialisation_id: {
+            type: 'integer',
+            title: 'Specialisation Id'
+        },
+        service_name: {
+            type: 'string',
+            title: 'Service Name'
+        },
+        clinic_name: {
+            type: 'string',
+            title: 'Clinic Name'
+        },
+        consultation_fee: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Consultation Fee'
+        },
+        clinic_logo_path: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Clinic Logo Path'
+        },
+        banner_image_path: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Banner Image Path'
+        },
+        image_url: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Image Url'
+        },
+        title: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Title'
+        },
+        credentials: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Credentials'
+        },
+        bio: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Bio'
+        },
+        full_bio: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Full Bio'
+        },
+        service_details: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Service Details'
+        },
+        languages: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Languages'
+        },
+        years_of_practice: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Years Of Practice'
+        },
+        hospital_affiliations: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Hospital Affiliations'
+        },
+        board_certifications: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Board Certifications'
+        },
+        awards: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Awards'
+        },
+        insurance_tpa: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Insurance Tpa'
+        },
+        insurance_shield_plan: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Insurance Shield Plan'
+        },
+        contact_name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Name'
+        },
+        contact_email: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Email'
+        },
+        contact_phone: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Contact Phone'
+        },
+        cc_emails: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Cc Emails'
+        },
+        available_days: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Days'
+        },
+        available_time_slots: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Available Time Slots'
+        },
+        day_availability: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Day Availability'
+        },
+        active: {
+            type: 'boolean',
+            title: 'Active'
+        },
+        blocked_dates: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Blocked Dates'
+        },
+        blocked_today: {
+            type: 'boolean',
+            title: 'Blocked Today',
+            default: false
+        },
+        display_order: {
+            type: 'integer',
+            title: 'Display Order'
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
+        },
+        updated_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Updated At'
+        },
+        specialisation: {
+            anyOf: [
+                {
+                    '$ref': '#/components/schemas/SpecialisationBasic'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        }
+    },
+    type: 'object',
+    required: ['id', 'type', 'specialisation_id', 'service_name', 'clinic_name', 'active', 'display_order', 'created_at'],
+    title: 'UnifiedServiceResponse',
+    description: 'Normalized response for both ClinicService and Specialist lookups.'
+} as const;
+
+export const $UnsubscribeReq = {
+    properties: {
+        token: {
+            type: 'string',
+            title: 'Token'
+        }
+    },
+    type: 'object',
+    required: ['token'],
+    title: 'UnsubscribeReq'
+} as const;
+
 export const $UntagDoctorParams = {
     properties: {
         id: {
@@ -7181,6 +10690,28 @@ export const $UpdateProfileParams = {
     properties: {
         language: {
             '$ref': '#/components/schemas/SGiMedLanguage'
+        },
+        enable_notifications: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Enable Notifications'
+        },
+        marketing_opt_in: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Marketing Opt In'
         }
     },
     type: 'object',
@@ -7362,6 +10893,7 @@ export const $ValidateCorporateCodeResp = {
         corporate_survey_template: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -7403,6 +10935,13 @@ export const $ValidationError = {
         type: {
             type: 'string',
             title: 'Error Type'
+        },
+        input: {
+            title: 'Input'
+        },
+        ctx: {
+            type: 'object',
+            title: 'Context'
         }
     },
     type: 'object',
@@ -8024,6 +11563,7 @@ export const $YuuTransactionResp = {
         refund_details: {
             anyOf: [
                 {
+                    additionalProperties: true,
                     type: 'object'
                 },
                 {
@@ -8148,10 +11688,12 @@ export const $routers__doctor__teleconsult__VideoResp = {
             title: 'Sessionidletimeoutmins'
         },
         audioOptions: {
+            additionalProperties: true,
             type: 'object',
             title: 'Audiooptions'
         },
         videoOptions: {
+            additionalProperties: true,
             type: 'object',
             title: 'Videooptions'
         }
@@ -8570,10 +12112,12 @@ export const $routers__patient__teleconsult__VideoResp = {
             title: 'Sessionidletimeoutmins'
         },
         audioOptions: {
+            additionalProperties: true,
             type: 'object',
             title: 'Audiooptions'
         },
         videoOptions: {
+            additionalProperties: true,
             type: 'object',
             title: 'Videooptions'
         }
@@ -8586,6 +12130,7 @@ export const $routers__patient__teleconsult__VideoResp = {
 export const $routers__patient__teleconsult_family__AddFamilyReq = {
     properties: {
         patient_ids_allergies: {
+            additionalProperties: true,
             type: 'object',
             title: 'Patient Ids Allergies'
         }
@@ -8750,6 +12295,7 @@ export const $routers__patient__teleconsult_family__JoinQueueReq = {
             title: 'User Allergy'
         },
         allergies: {
+            additionalProperties: true,
             type: 'object',
             title: 'Allergies',
             default: {}
@@ -8787,6 +12333,7 @@ export const $routers__patient__teleconsult_family__JoinQueueResp = {
             title: 'Prepayment Required'
         },
         payment_provider_params: {
+            additionalProperties: true,
             type: 'object',
             title: 'Payment Provider Params'
         },
@@ -8853,6 +12400,7 @@ export const $routers__patient__teleconsult_family__PrepaymentRateResp = {
             title: 'User Allergy'
         },
         allergies: {
+            additionalProperties: true,
             type: 'object',
             title: 'Allergies'
         },
@@ -9069,10 +12617,12 @@ export const $routers__patient__teleconsult_family__VideoResp = {
             title: 'Sessionidletimeoutmins'
         },
         audioOptions: {
+            additionalProperties: true,
             type: 'object',
             title: 'Audiooptions'
         },
         videoOptions: {
+            additionalProperties: true,
             type: 'object',
             title: 'Videooptions'
         },

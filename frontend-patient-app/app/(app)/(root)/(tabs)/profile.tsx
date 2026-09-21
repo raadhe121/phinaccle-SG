@@ -68,6 +68,9 @@ export default function ProfileScreen() {
             <MenuItem icon="BankcardOutline" onPress={() => router.navigate('/profile/payment_methods')}>
                 Payment Methods
             </MenuItem>
+            <MenuItem icon="SettingsOutline" onPress={() => router.navigate('/profile/notification-settings')}>
+                Notification Settings
+            </MenuItem>
             {
                 yuuLaunched && <MenuItem 
                     icon={<Image source={require('@/assets/images/yuu_icon.png')} style={{ width: 24, height: 24 }} />} 

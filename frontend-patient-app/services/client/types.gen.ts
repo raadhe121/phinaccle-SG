@@ -44,6 +44,10 @@ export type AddressParams = {
     residential_building?: string | null;
 };
 
+export type AppointmentCancelRequest = {
+    reason: string;
+};
+
 export type AppointmentCategory = 'general' | 'specialist';
 
 export type AppointmentDetailsActions = {
@@ -117,6 +121,58 @@ export type AppointmentListItem = {
     group_id: string | null;
     is_guest: boolean;
     created_at: string;
+};
+
+export type AppointmentRequestCreate = {
+    specialisation_id: number;
+    specialist_id?: number | null;
+    service_id?: number | null;
+    patient_name: string;
+    patient_dob?: string | null;
+    contact_number: string;
+    email: string;
+    preferred_days?: string | null;
+    preferred_time?: string | null;
+    reason?: string | null;
+    additional_info?: string | null;
+};
+
+export type AppointmentRequestResponse = {
+    specialisation_id: number;
+    specialist_id?: number | null;
+    service_id?: number | null;
+    patient_name: string;
+    patient_dob?: string | null;
+    contact_number: string;
+    email: string;
+    preferred_days?: string | null;
+    preferred_time?: string | null;
+    reason?: string | null;
+    additional_info?: string | null;
+    id: number;
+    booking_type: 'doctor' | 'service' | 'unknown';
+    status: RequestStatus;
+    status_message?: string | null;
+    reschedule_reason?: string | null;
+    submitted_at: string;
+    updated_at?: string | null;
+    specialist?: SpecialistBasic | null;
+    service?: ServiceBasic | null;
+    date: string;
+    time_slot: string;
+};
+
+export type booking_type = 'doctor' | 'service' | 'unknown';
+
+export type AppointmentRequestStatusUpdate = {
+    status: RequestStatus;
+    status_message?: string | null;
+};
+
+export type AppointmentRescheduleRequest = {
+    preferred_days: string;
+    preferred_time: string;
+    reason?: string | null;
 };
 
 export type AppointmentRow = {
@@ -205,6 +261,43 @@ export type BlockoffUpdate = {
     remarks?: string | null;
 };
 
+export type Body_block_for_date_api_admin_services__service_id__block_post = {
+    block_date?: string | null;
+};
+
+export type Body_block_for_date_specialists__specialist_id__block_post = {
+    block_date?: string | null;
+};
+
+export type Body_create_api_admin_services__post = {
+    specialisation_id: number;
+    service_name: string;
+    clinic_name: string;
+    consultation_fee?: string | null;
+    bio?: string;
+    service_details?: string;
+    languages?: string;
+    years_of_practice?: number | null;
+    hospital_affiliations?: string;
+    board_certifications?: string;
+    awards?: string;
+    insurance_tpa?: string;
+    insurance_shield_plan?: string;
+    contact_name?: string;
+    contact_email?: string;
+    contact_phone?: string;
+    cc_emails?: string | null;
+    available_days?: string;
+    available_time_slots?: string;
+    day_availability?: string | null;
+    blocked_dates?: string | null;
+    active?: string;
+    display_order?: number;
+    image?: string | null;
+    clinic_logo?: string | null;
+    banner_image?: string | null;
+};
+
 export type Body_create_branch_api_admin_branches_post = {
     name: string;
     address: string;
@@ -213,7 +306,7 @@ export type Body_create_branch_api_admin_branches_post = {
     email?: string | null;
     url?: string | null;
     category: string;
-    image?: (Blob | File) | null;
+    image?: string | null;
 };
 
 export type Body_create_onsite_branch_api_admin_appointments_v1_onsite_branch_post = {
@@ -224,7 +317,7 @@ export type Body_create_onsite_branch_api_admin_appointments_v1_onsite_branch_po
     email?: string | null;
     url?: string | null;
     category?: string;
-    image?: (Blob | File) | null;
+    image?: string | null;
     corporate_code_id: string;
     sgimed_branch_id?: string | null;
     sgimed_calendar_id?: string | null;
@@ -234,16 +327,95 @@ export type Body_create_onsite_branch_api_admin_appointments_v1_onsite_branch_po
     appointment_category?: AppointmentCategory;
 };
 
+export type Body_create_specialisations__post = {
+    name: string;
+    slug: string;
+    description?: string;
+    display_mode?: string;
+    display_order?: number;
+    active?: string;
+    icon?: string | null;
+    banner?: string | null;
+};
+
+export type Body_create_specialists__post = {
+    specialisation_id: number;
+    title?: string;
+    name: string;
+    credentials?: string;
+    short_bio?: string;
+    full_bio?: string;
+    languages?: string;
+    appointment_email: string;
+    contact_email?: string;
+    contact_phone?: string;
+    available_days?: string;
+    available_time_slots?: string;
+    day_availability?: string | null;
+    clinic_name: string;
+    consultation_fee?: string | null;
+    years_of_practice?: number | null;
+    hospital_affiliations?: string;
+    board_certifications?: string;
+    awards?: string;
+    insurance_tpa?: string;
+    insurance_shield_plan?: string;
+    cc_emails?: string | null;
+    display_order?: number;
+    active?: string;
+    blocked_dates?: string | null;
+    image?: string | null;
+    clinic_logo?: string | null;
+    banner_image?: string | null;
+};
+
 export type Body_dispatch_update_teleconsult_delivery_status_route_api_delivery_dispatch_update_delivery_status_put = {
     request_json: string;
-    file?: (Blob | File) | null;
+    file?: string | null;
+};
+
+export type Body_unblock_for_date_api_admin_services__service_id__unblock_post = {
+    block_date?: string | null;
+};
+
+export type Body_unblock_for_date_specialists__specialist_id__unblock_post = {
+    block_date?: string | null;
+};
+
+export type Body_update_api_admin_services__service_id__patch = {
+    specialisation_id?: number | null;
+    service_name?: string;
+    clinic_name?: string;
+    consultation_fee?: string | null;
+    bio?: string;
+    service_details?: string;
+    languages?: string;
+    years_of_practice?: number | null;
+    hospital_affiliations?: string;
+    board_certifications?: string;
+    awards?: string;
+    insurance_tpa?: string;
+    insurance_shield_plan?: string;
+    contact_name?: string;
+    contact_email?: string;
+    contact_phone?: string;
+    cc_emails?: string | null;
+    available_days?: string;
+    available_time_slots?: string;
+    day_availability?: string | null;
+    blocked_dates?: string | null;
+    active?: string | null;
+    display_order?: number | null;
+    image?: string | null;
+    clinic_logo?: string | null;
+    banner_image?: string | null;
 };
 
 export type Body_update_branch_api_admin_branches__branch_id__put = {
     address?: string | null;
     url?: string | null;
     services?: Array<(string)>;
-    image?: (Blob | File) | null;
+    image?: string | null;
 };
 
 export type Body_update_onsite_branch_api_admin_appointments_v1_onsite_branches__onsite_id__put = {
@@ -254,7 +426,7 @@ export type Body_update_onsite_branch_api_admin_appointments_v1_onsite_branches_
     email?: string | null;
     url?: string | null;
     category?: string | null;
-    image?: (Blob | File) | null;
+    image?: string | null;
     branch_id?: string | null;
     corporate_code_id?: string | null;
     sgimed_branch_id?: string | null;
@@ -263,12 +435,54 @@ export type Body_update_onsite_branch_api_admin_appointments_v1_onsite_branches_
     end_date?: string | null;
 };
 
+export type Body_update_specialisations__specialisation_id__patch = {
+    name?: string;
+    slug?: string;
+    description?: string;
+    display_mode?: string | null;
+    display_order?: number | null;
+    active?: string | null;
+    icon?: string | null;
+    banner?: string | null;
+};
+
+export type Body_update_specialists__specialist_id__patch = {
+    specialisation_id?: number | null;
+    title?: string;
+    name?: string;
+    credentials?: string;
+    short_bio?: string;
+    full_bio?: string;
+    languages?: string;
+    appointment_email?: string;
+    contact_email?: string;
+    contact_phone?: string;
+    available_days?: string;
+    available_time_slots?: string;
+    day_availability?: string | null;
+    clinic_name?: string;
+    consultation_fee?: string | null;
+    years_of_practice?: number | null;
+    hospital_affiliations?: string;
+    board_certifications?: string;
+    awards?: string;
+    insurance_tpa?: string;
+    insurance_shield_plan?: string;
+    cc_emails?: string | null;
+    display_order?: number | null;
+    active?: string | null;
+    blocked_dates?: string | null;
+    image?: string | null;
+    clinic_logo?: string | null;
+    banner_image?: string | null;
+};
+
 export type Body_upload_corporate_users_api_admin_corporate_users_upload_post = {
-    file: (Blob | File);
+    file: string;
 };
 
 export type Body_upload_table_api_admin_st_andrew_upload_post = {
-    file: (Blob | File);
+    file: string;
 };
 
 export type BranchDetails = {
@@ -370,6 +584,13 @@ export type BranchSelectOption = {
     label: string;
 };
 
+export type BranchSessionCapacityResponse = {
+    branch_id: string;
+    branch_name: string;
+    date: string;
+    slots: Array<SessionSlotCapacity>;
+};
+
 export type BranchType = 'main' | 'onsite';
 
 export type CalendarItem = {
@@ -381,6 +602,52 @@ export type CalendarItem = {
 
 export type CalendarListResponse = {
     calendars: Array<CalendarItem>;
+};
+
+export type CampaignCreateReq = {
+    /**
+     * consent_notice | marketing | system
+     */
+    type: string;
+    /**
+     * Notification header
+     */
+    title: string;
+    /**
+     * Notification message
+     */
+    body: string;
+    /**
+     * e.g. {"pathname": "/profile/notification-settings"}
+     */
+    data?: {
+    [key: string]: unknown;
+} | null;
+};
+
+export type CampaignListResp = {
+    rows: Array<CampaignRow>;
+};
+
+export type CampaignRow = {
+    id: string;
+    type: string;
+    title: string;
+    body: string;
+    data: {
+    [key: string]: unknown;
+} | null;
+    status: string;
+    total_recipients: number;
+    sent_count: number;
+    failed_count: number;
+    skipped_count: number;
+    pending_count: number;
+    delivered_count: number;
+    undelivered_count: number;
+    created_at: string | null;
+    started_at: string | null;
+    completed_at: string | null;
 };
 
 export type CancelParams = {
@@ -431,6 +698,8 @@ export type CorporateCodeCreate = {
     valid_to?: string | null;
     is_active?: boolean;
     category?: AppointmentCategory;
+    max_appointments_total?: number | null;
+    max_appointments_per_day?: number | null;
     service_group_ids?: Array<(string)>;
     onsite_branches?: Array<OnsiteBranchCreateRequest>;
 };
@@ -449,11 +718,34 @@ export type CorporateCodeDetails = {
     valid_to?: string | null;
     is_active?: boolean;
     category?: AppointmentCategory;
+    max_appointments_total?: number | null;
+    max_appointments_per_day?: number | null;
     id: string;
     service_groups: Array<ServiceGroupReference>;
     onsite_branches: Array<OnsiteBranchReference>;
     created_at: string;
     updated_at: string;
+};
+
+/**
+ * Full details for a corporate code override including inventory item info.
+ */
+export type CorporateCodeOverrideInfo = {
+    corporate_code_id: string;
+    inventory_item_ids?: Array<(string)>;
+    inventory_items?: Array<InventoryItemInfo>;
+};
+
+export type CorporateCodeQuotaUsage = {
+    corporate_code_id: string;
+    code: string;
+    organization: string;
+    max_appointments_total: number | null;
+    max_appointments_per_day: number | null;
+    total_appointments_used: number;
+    today_appointments_used: number;
+    quota_remaining_total: number | null;
+    quota_remaining_today: number | null;
 };
 
 export type CorporateCodeResp = {
@@ -485,6 +777,8 @@ export type CorporateCodeUpdate = {
     is_active?: boolean | null;
     service_group_ids?: Array<(string)> | null;
     onsite_branches?: Array<OnsiteBranchCreateRequest> | null;
+    max_appointments_total?: number | null;
+    max_appointments_per_day?: number | null;
 };
 
 export type CorporateCodeV2Row = {
@@ -666,6 +960,7 @@ export type DynamicPricingRow = {
     corporate_code_overrides?: {
         [key: string]: Array<(string)>;
     };
+    corporate_code_override_details?: Array<CorporateCodeOverrideInfo>;
 };
 
 export type DynamicRateResp = {
@@ -684,6 +979,35 @@ export type EditPinnacleZoneRequest = {
 
 export type ElapsedTimeResp = {
     elapsed_time: number;
+};
+
+export type EmailTemplateCreate = {
+    label: string;
+    subject: string;
+    body_html: string;
+    body_text: string;
+    description?: string | null;
+    template_key: string;
+};
+
+export type EmailTemplateResponse = {
+    label: string;
+    subject: string;
+    body_html: string;
+    body_text: string;
+    description?: string | null;
+    id: number;
+    template_key: string;
+    created_at: string;
+    updated_at?: string | null;
+};
+
+export type EmailTemplateUpdate = {
+    label?: string | null;
+    subject?: string | null;
+    body_html?: string | null;
+    body_text?: string | null;
+    description?: string | null;
 };
 
 export type FamilyDetails = {
@@ -1007,6 +1331,7 @@ export type OperatingHourCreate = {
     end_time: string;
     cutoff_time?: number;
     max_bookings?: number;
+    max_appointments_per_session?: number | null;
     branch_id: string;
 };
 
@@ -1092,6 +1417,21 @@ export type PatientInfo = {
 
 export type type2 = 'myself' | 'family' | 'guest';
 
+export type PatientPreferenceListResp = {
+    total: number;
+    rows: Array<PatientPreferenceRow>;
+};
+
+export type PatientPreferenceRow = {
+    account_id: string;
+    name: string | null;
+    mobile: string | null;
+    enable_notifications: boolean;
+    marketing_opt_in: boolean;
+    opted_out_at: string | null;
+    opt_out_source: string | null;
+};
+
 export type PatientType = 'private_patient' | 'migrant_worker';
 
 export type Payment2C2PWebhookPayload = {
@@ -1153,6 +1493,16 @@ export type PaymentTokenResponse = {
 
 export type PhoneCountryCode = '+44' | '+1' | '+213' | '+376' | '+244' | '+1264' | '+1268' | '+54' | '+374' | '+297' | '+61' | '+43' | '+994' | '+1242' | '+973' | '+880' | '+1246' | '+375' | '+32' | '+501' | '+229' | '+1441' | '+975' | '+591' | '+387' | '+267' | '+55' | '+673' | '+359' | '+226' | '+257' | '+855' | '+237' | '+238' | '+1345' | '+236' | '+56' | '+86' | '+57' | '+269' | '+242' | '+682' | '+506' | '+385' | '+53' | '+90392' | '+357' | '+42' | '+45' | '+253' | '+1809' | '+593' | '+20' | '+503' | '+240' | '+291' | '+372' | '+251' | '+500' | '+298' | '+679' | '+358' | '+33' | '+594' | '+689' | '+241' | '+220' | '+7880' | '+49' | '+233' | '+350' | '+30' | '+299' | '+1473' | '+590' | '+671' | '+502' | '+224' | '+245' | '+592' | '+509' | '+504' | '+852' | '+36' | '+354' | '+91' | '+62' | '+98' | '+964' | '+353' | '+972' | '+39' | '+1876' | '+81' | '+962' | '+7' | '+254' | '+686' | '+850' | '+82' | '+965' | '+996' | '+856' | '+371' | '+961' | '+266' | '+231' | '+218' | '+417' | '+370' | '+352' | '+853' | '+389' | '+261' | '+265' | '+60' | '+960' | '+223' | '+356' | '+692' | '+596' | '+222' | '+230' | '+52' | '+691' | '+373' | '+377' | '+976' | '+1664' | '+212' | '+258' | '+95' | '+264' | '+674' | '+977' | '+31' | '+687' | '+64' | '+505' | '+227' | '+234' | '+683' | '+672' | '+670' | '+47' | '+968' | '+680' | '+507' | '+675' | '+595' | '+51' | '+63' | '+48' | '+351' | '+1787' | '+974' | '+262' | '+40' | '+250' | '+378' | '+239' | '+966' | '+221' | '+381' | '+248' | '+232' | '+65' | '+421' | '+386' | '+677' | '+252' | '+27' | '+34' | '+94' | '+290' | '+1869' | '+1758' | '+249' | '+597' | '+268' | '+46' | '+41' | '+963' | '+886' | '+66' | '+228' | '+676' | '+1868' | '+216' | '+90' | '+993' | '+1649' | '+688' | '+256' | '+380' | '+971' | '+598' | '+678' | '+379' | '+58' | '+84' | '+1284' | '+1340' | '+681' | '+969' | '+967' | '+260' | '+263';
 
+export type PreferenceResp = {
+    enable_notifications: boolean;
+    marketing_opt_in: boolean;
+};
+
+export type PreferenceUpdateReq = {
+    enable_notifications?: boolean | null;
+    marketing_opt_in?: boolean | null;
+};
+
 export type PrepaymentRateReq = {
     code?: string | null;
     family_ids?: Array<(string)>;
@@ -1180,6 +1530,9 @@ export type ProfileParams = {
     nationality: SGiMedNationality;
     language: SGiMedLanguage;
     gender: SGiMedGender;
+    patient_type: PatientType;
+    enable_notifications?: boolean;
+    marketing_opt_in?: boolean;
 };
 
 export type ProfileResp = {
@@ -1206,6 +1559,25 @@ export type PushTokenReq = {
     push_token: string;
 };
 
+export type RecipientListResp = {
+    total: number;
+    rows: Array<RecipientRow>;
+};
+
+export type RecipientRow = {
+    account_id: string;
+    name: string | null;
+    mobile: string | null;
+    status: string;
+    attempts: number;
+    last_error: string | null;
+    sent_at: string | null;
+    delivery: string;
+    receipt_status: string | null;
+    receipt_error: string | null;
+    receipt_checked_at: string | null;
+};
+
 export type RedisAuthState = 'verify_otp' | 'verify_dob' | 'register' | 'logged_in' | 'change_mobile';
 
 export type RedisLoginState = {
@@ -1223,6 +1595,8 @@ export type RegenerateHealthReportResponse = {
     success: boolean;
     message: string;
     reports_regenerated: number;
+    measurements_fetched?: number | null;
+    measurements_created?: number | null;
 };
 
 export type RegisterInput = {
@@ -1235,6 +1609,8 @@ export type RegisterInput = {
     nationality: SGiMedNationality;
     language: SGiMedLanguage;
     gender: SGiMedGender;
+    enable_notifications?: boolean;
+    marketing_opt_in?: boolean;
 };
 
 export type RegisterResponse = {
@@ -1252,6 +1628,8 @@ export type ReportSummaryResp = {
     results: Array<TestResult>;
     lab_reports: Array<LabReportBlock>;
 };
+
+export type RequestStatus = 'requested' | 'confirmed' | 'rejected' | 'completed' | 'rescheduled' | 'cancelled';
 
 export type RescheduleAppointmentReq = {
     new_start_datetime: string;
@@ -1297,6 +1675,12 @@ export type SGiMedWebhookRequest = {
 export type SelectOption = {
     value: string;
     label: string;
+};
+
+export type ServiceBasic = {
+    id: number;
+    service_name: string;
+    clinic_name: string;
 };
 
 export type ServiceCreate = {
@@ -1346,6 +1730,8 @@ export type ServiceGroupCreate = {
     duration: number;
     type: AppointmentServiceGroupType;
     restricted_branches?: Array<(string)>;
+    available_days?: Array<DayOfWeek>;
+    available_time_slots?: Array<(string)>;
     corporate_code_id?: string | null;
     category?: AppointmentCategory;
 };
@@ -1358,6 +1744,8 @@ export type ServiceGroupDetails = {
     duration: number;
     type: AppointmentServiceGroupType;
     restricted_branches?: Array<(string)>;
+    available_days?: Array<DayOfWeek>;
+    available_time_slots?: Array<(string)>;
     corporate_code_id?: string | null;
     category?: AppointmentCategory;
     id: string;
@@ -1384,6 +1772,8 @@ export type ServiceGroupUpdate = {
     duration?: number | null;
     type?: AppointmentServiceGroupType | null;
     restricted_branches?: Array<(string)> | null;
+    available_days?: Array<DayOfWeek> | null;
+    available_time_slots?: Array<(string)> | null;
     corporate_code_id?: string | null;
     category?: AppointmentCategory | null;
 };
@@ -1400,6 +1790,42 @@ export type ServiceResp = {
     services: Array<ServiceGroup>;
 };
 
+export type ServiceResponse = {
+    specialisation_id: number;
+    service_name: string;
+    clinic_name: string;
+    consultation_fee?: string | null;
+    image_url?: string | null;
+    clinic_logo_path?: string | null;
+    banner_image_path?: string | null;
+    bio?: string | null;
+    service_details?: string | null;
+    languages?: string | null;
+    years_of_practice?: number | null;
+    hospital_affiliations?: string | null;
+    board_certifications?: string | null;
+    awards?: string | null;
+    insurance_tpa?: string | null;
+    insurance_shield_plan?: string | null;
+    contact_name?: string | null;
+    contact_email?: string | null;
+    contact_phone?: string | null;
+    cc_emails?: Array<(string)> | null;
+    available_days?: string | null;
+    available_time_slots?: string | null;
+    day_availability?: {
+    [key: string]: Array<(string)>;
+} | null;
+    active?: boolean;
+    display_order?: number;
+    blocked_dates?: Array<(string)> | null;
+    id: number;
+    blocked_today?: boolean;
+    created_at: string;
+    updated_at?: string | null;
+    specialisation?: SpecialisationBasic | null;
+};
+
 export type ServiceUpdate = {
     name?: string | null;
     prepayment_price?: number | null;
@@ -1412,6 +1838,17 @@ export type ServiceUpdate = {
     group_id?: string | null;
 };
 
+export type SessionSlotCapacity = {
+    slot_id: string;
+    day: string;
+    start_time: string;
+    end_time: string;
+    max_appointments_per_session: number | null;
+    booked_count: number;
+    available: number | null;
+    is_full: boolean;
+};
+
 export type SetDefaultPaymentMethodReq = {
     payment_method: PaymentMethod;
     payment_method_id?: string | null;
@@ -1420,6 +1857,75 @@ export type SetDefaultPaymentMethodReq = {
 export type SignedURLResponse = {
     url: string;
     filetype: FileViewerType;
+};
+
+export type SpecialisationBasic = {
+    id: number;
+    name: string;
+    slug: string;
+};
+
+export type SpecialisationResponse = {
+    name: string;
+    slug: string;
+    description?: string | null;
+    icon_url?: string | null;
+    banner_url?: string | null;
+    display_mode?: 'doctors' | 'services';
+    display_order?: number;
+    active?: boolean;
+    id: number;
+    created_at: string;
+    updated_at?: string | null;
+    specialists?: Array<SpecialistResponse> | null;
+    services?: Array<ServiceResponse> | null;
+};
+
+export type display_mode = 'doctors' | 'services';
+
+export type SpecialistBasic = {
+    id: number;
+    name: string;
+    title?: string | null;
+    image_url?: string | null;
+};
+
+export type SpecialistResponse = {
+    specialisation_id: number;
+    title?: string | null;
+    name: string;
+    image_url?: string | null;
+    credentials?: string | null;
+    short_bio?: string | null;
+    full_bio?: string | null;
+    languages?: string | null;
+    appointment_email: string;
+    contact_email?: string | null;
+    contact_phone?: string | null;
+    available_days?: string | null;
+    available_time_slots?: string | null;
+    day_availability?: {
+    [key: string]: Array<(string)>;
+} | null;
+    clinic_name: string;
+    clinic_logo_path?: string | null;
+    banner_image_path?: string | null;
+    consultation_fee?: string | null;
+    years_of_practice?: number | null;
+    hospital_affiliations?: string | null;
+    board_certifications?: string | null;
+    awards?: string | null;
+    insurance_tpa?: string | null;
+    insurance_shield_plan?: string | null;
+    cc_emails?: Array<(string)> | null;
+    display_order?: number;
+    active?: boolean;
+    blocked_dates?: Array<(string)> | null;
+    id: number;
+    blocked_today?: boolean;
+    created_at: string;
+    updated_at?: string | null;
+    specialisation?: SpecialisationBasic | null;
 };
 
 export type StAndrewMetadataResp = {
@@ -1555,6 +2061,55 @@ export type ToggleNotificationsParams = {
     enable_notifications: boolean;
 };
 
+/**
+ * Normalized response for both ClinicService and Specialist lookups.
+ */
+export type UnifiedServiceResponse = {
+    id: number;
+    type: 'service' | 'specialist';
+    specialisation_id: number;
+    service_name: string;
+    clinic_name: string;
+    consultation_fee?: string | null;
+    clinic_logo_path?: string | null;
+    banner_image_path?: string | null;
+    image_url?: string | null;
+    title?: string | null;
+    credentials?: string | null;
+    bio?: string | null;
+    full_bio?: string | null;
+    service_details?: string | null;
+    languages?: string | null;
+    years_of_practice?: number | null;
+    hospital_affiliations?: string | null;
+    board_certifications?: string | null;
+    awards?: string | null;
+    insurance_tpa?: string | null;
+    insurance_shield_plan?: string | null;
+    contact_name?: string | null;
+    contact_email?: string | null;
+    contact_phone?: string | null;
+    cc_emails?: Array<(string)> | null;
+    available_days?: string | null;
+    available_time_slots?: string | null;
+    day_availability?: {
+    [key: string]: unknown;
+} | null;
+    active: boolean;
+    blocked_dates?: Array<(string)> | null;
+    blocked_today?: boolean;
+    display_order: number;
+    created_at: string;
+    updated_at?: string | null;
+    specialisation?: SpecialisationBasic | null;
+};
+
+export type type3 = 'service' | 'specialist';
+
+export type UnsubscribeReq = {
+    token: string;
+};
+
 export type UntagDoctorParams = {
     id: string;
 };
@@ -1591,8 +2146,9 @@ export type UpdatePatientDiff = {
 };
 
 export type UpdateProfileParams = {
-    // marketing_opt_out: any,
     language: SGiMedLanguage;
+    enable_notifications?: boolean | null;
+    marketing_opt_in?: boolean | null;
 };
 
 export type UpdateStatusParams = {
@@ -1641,6 +2197,10 @@ export type ValidationError = {
     loc: Array<(string | number)>;
     msg: string;
     type: string;
+    input?: unknown;
+    ctx?: {
+        [key: string]: unknown;
+    };
 };
 
 export type VerifyDOBInput = {
@@ -2329,13 +2889,17 @@ export type DeeplinkCheckApiAppointmentV1DeeplinkGetResponse = DeeplinkResp;
 export type GetServicesApiAppointmentV1ServicesGetData = {
     branchIds?: string | null;
     code?: string | null;
+    currDate?: string | null;
+    timeSlot?: string | null;
 };
 
 export type GetServicesApiAppointmentV1ServicesGetResponse = ServiceResp;
 
 export type GetServiceApiAppointmentV1ServiceIdGetData = {
     branchIds?: string | null;
+    currDate?: string | null;
     id: string;
+    timeSlot?: string | null;
 };
 
 export type GetServiceApiAppointmentV1ServiceIdGetResponse = GetServiceResp;
@@ -2545,6 +3109,20 @@ export type GetAllowedRouteApiActivityRouteGetResponse = ActivityRouteResp;
 
 export type GetActivityApiActivityGetResponse = ActivityResp;
 
+export type GetPreferencesApiNotificationPreferencesGetResponse = PreferenceResp;
+
+export type UpdatePreferencesApiNotificationPreferencesPatchData = {
+    requestBody: PreferenceUpdateReq;
+};
+
+export type UpdatePreferencesApiNotificationPreferencesPatchResponse = PreferenceResp;
+
+export type UnsubscribeViaLinkApiNotificationPreferencesUnsubscribePostData = {
+    requestBody: UnsubscribeReq;
+};
+
+export type UnsubscribeViaLinkApiNotificationPreferencesUnsubscribePostResponse = SuccessResp;
+
 export type GetServicesApiWalkinServicesGetResponse = Array<(string)>;
 
 export type GetAvailableBranchesApiWalkinBranchesGetData = {
@@ -2626,6 +3204,13 @@ export type Handle2C2pWebhookApi2C2pWebhookPostData = {
 };
 
 export type Handle2C2pWebhookApi2C2pWebhookPostResponse = SuccessResp;
+
+export type GetPaymentMethodsApiPaymentMethodsGetData = {
+    /**
+     * Patient type for filtering payment methods (private_patient, migrant_worker)
+     */
+    patientType?: string | null;
+};
 
 export type GetPaymentMethodsApiPaymentMethodsGetResponse = PaymentMethodsResp;
 
@@ -3060,8 +3645,10 @@ export type RegenerateHealthReportByNricApiAdminHealthReportsNricRegeneratePostD
 export type RegenerateHealthReportByNricApiAdminHealthReportsNricRegeneratePostResponse = RegenerateHealthReportResponse;
 
 export type GetYuuEnrollmentsApiAdminYuuEnrollmentsGetData = {
+    endDate?: string | null;
     page?: number;
     search?: string | null;
+    startDate?: string | null;
 };
 
 export type GetYuuEnrollmentsApiAdminYuuEnrollmentsGetResponse = Page_YuuEnrollmentResp_;
@@ -3204,6 +3791,12 @@ export type DeleteCorporateCodeApiAdminAppointmentsV1CorporateCodesCodeIdDeleteD
 
 export type DeleteCorporateCodeApiAdminAppointmentsV1CorporateCodesCodeIdDeleteResponse = SuccessResponse;
 
+export type GetCorporateCodeQuotaUsageApiAdminAppointmentsV1CorporateCodesCodeIdQuotaUsageGetData = {
+    codeId: string;
+};
+
+export type GetCorporateCodeQuotaUsageApiAdminAppointmentsV1CorporateCodesCodeIdQuotaUsageGetResponse = CorporateCodeQuotaUsage;
+
 export type ExportCorporateSurveyCsvApiAdminAppointmentsV1CorporateCodesCodeIdExportSurveyCsvGetData = {
     codeId: string;
     dateFrom?: string | null;
@@ -3239,6 +3832,8 @@ export type DeleteOnsiteBranchApiAdminAppointmentsV1OnsiteBranchesOnsiteIdDelete
 
 export type DeleteOnsiteBranchApiAdminAppointmentsV1OnsiteBranchesOnsiteIdDeleteResponse = SuccessResponse;
 
+export type GetOnsiteHoursApiAdminAppointmentsV1OnsiteHoursGetResponse = Array<BranchOperatingHoursResponse>;
+
 export type GetSgimedBranchesApiAdminAppointmentsV1SgimedBranchesGetResponse = Array<SGiMedBranchOption>;
 
 export type CreateOnsiteBranchApiAdminAppointmentsV1OnsiteBranchPostData = {
@@ -3261,6 +3856,13 @@ export type UpdateBranchOperatingHoursApiAdminAppointmentsV1OperatingHoursBranch
 };
 
 export type UpdateBranchOperatingHoursApiAdminAppointmentsV1OperatingHoursBranchIdPutResponse = SuccessResponse;
+
+export type GetBranchSessionCapacityApiAdminAppointmentsV1OperatingHoursBranchIdSessionCapacityGetData = {
+    branchId: string;
+    date?: string | null;
+};
+
+export type GetBranchSessionCapacityApiAdminAppointmentsV1OperatingHoursBranchIdSessionCapacityGetResponse = BranchSessionCapacityResponse;
 
 export type CreateOperatingHourApiAdminAppointmentsV1OperatingHoursPostData = {
     requestBody: OperatingHourCreate;
@@ -3399,6 +4001,127 @@ export type DeleteSpecialistOnsiteBranchApiAdminSpecialistsV1OnsiteBranchesOnsit
 
 export type DeleteSpecialistOnsiteBranchApiAdminSpecialistsV1OnsiteBranchesOnsiteIdDeleteResponse = SuccessResponse;
 
+export type GetAllApiAdminServicesGetResponse = Array<ServiceResponse>;
+
+export type CreateApiAdminServicesPostData = {
+    formData: Body_create_api_admin_services__post;
+};
+
+export type CreateApiAdminServicesPostResponse = ServiceResponse;
+
+export type GetActiveApiAdminServicesActiveGetResponse = Array<ServiceResponse>;
+
+export type GetBySpecialisationApiAdminServicesBySpecialisationSpecialisationIdGetData = {
+    specialisationId: number;
+};
+
+export type GetBySpecialisationApiAdminServicesBySpecialisationSpecialisationIdGetResponse = Array<ServiceResponse>;
+
+export type GetOneApiAdminServicesServiceIdGetData = {
+    serviceId: number;
+    type?: 'service' | 'specialist' | null;
+};
+
+export type GetOneApiAdminServicesServiceIdGetResponse = UnifiedServiceResponse;
+
+export type UpdateApiAdminServicesServiceIdPatchData = {
+    formData?: Body_update_api_admin_services__service_id__patch;
+    serviceId: number;
+};
+
+export type UpdateApiAdminServicesServiceIdPatchResponse = ServiceResponse;
+
+export type DeleteApiAdminServicesServiceIdDeleteData = {
+    serviceId: number;
+};
+
+export type DeleteApiAdminServicesServiceIdDeleteResponse = unknown;
+
+export type BlockForDateApiAdminServicesServiceIdBlockPostData = {
+    formData?: Body_block_for_date_api_admin_services__service_id__block_post;
+    serviceId: number;
+};
+
+export type BlockForDateApiAdminServicesServiceIdBlockPostResponse = ServiceResponse;
+
+export type UnblockForDateApiAdminServicesServiceIdUnblockPostData = {
+    formData?: Body_unblock_for_date_api_admin_services__service_id__unblock_post;
+    serviceId: number;
+};
+
+export type UnblockForDateApiAdminServicesServiceIdUnblockPostResponse = ServiceResponse;
+
+export type ListCampaignsApiAdminMarketingCampaignsGetResponse = CampaignListResp;
+
+export type CreateCampaignApiAdminMarketingCampaignsPostData = {
+    requestBody: CampaignCreateReq;
+};
+
+export type CreateCampaignApiAdminMarketingCampaignsPostResponse = CampaignRow;
+
+export type ListPatientPreferencesApiAdminMarketingCampaignsPatientPreferencesGetData = {
+    limit?: number;
+    offset?: number;
+    /**
+     * filter: true=opted in, false=opted out
+     */
+    optIn?: boolean | null;
+    /**
+     * filter by name or mobile number
+     */
+    search?: string | null;
+};
+
+export type ListPatientPreferencesApiAdminMarketingCampaignsPatientPreferencesGetResponse = PatientPreferenceListResp;
+
+export type GetCampaignApiAdminMarketingCampaignsCampaignIdGetData = {
+    campaignId: string;
+};
+
+export type GetCampaignApiAdminMarketingCampaignsCampaignIdGetResponse = CampaignRow;
+
+export type DeleteCampaignApiAdminMarketingCampaignsCampaignIdDeleteData = {
+    campaignId: string;
+};
+
+export type DeleteCampaignApiAdminMarketingCampaignsCampaignIdDeleteResponse = SuccessResp;
+
+export type ListRecipientsApiAdminMarketingCampaignsCampaignIdRecipientsGetData = {
+    campaignId: string;
+    limit?: number;
+    offset?: number;
+    /**
+     * filter: pending|sent|failed|skipped|invalid_token
+     */
+    status?: string | null;
+};
+
+export type ListRecipientsApiAdminMarketingCampaignsCampaignIdRecipientsGetResponse = RecipientListResp;
+
+export type PrepareCampaignApiAdminMarketingCampaignsCampaignIdPreparePostData = {
+    campaignId: string;
+};
+
+export type PrepareCampaignApiAdminMarketingCampaignsCampaignIdPreparePostResponse = SuccessResp;
+
+export type StartCampaignApiAdminMarketingCampaignsCampaignIdStartPostData = {
+    campaignId: string;
+};
+
+export type StartCampaignApiAdminMarketingCampaignsCampaignIdStartPostResponse = SuccessResp;
+
+export type PauseCampaignApiAdminMarketingCampaignsCampaignIdPausePostData = {
+    campaignId: string;
+};
+
+export type PauseCampaignApiAdminMarketingCampaignsCampaignIdPausePostResponse = SuccessResp;
+
+export type ResumeCampaignApiAdminMarketingCampaignsCampaignIdResumePostData = {
+    campaignId: string;
+};
+
+export type ResumeCampaignApiAdminMarketingCampaignsCampaignIdResumePostResponse = SuccessResp;
+
 export type DispatchReadTeleconsultDeliveryRoutesApiDeliveryDispatchGetResponse = Array<TeleconsultDeliveryResponse>;
 
 export type DispatchUpdateTeleconsultDeliveryStatusRouteApiDeliveryDispatchUpdateDeliveryStatusPutData = {
@@ -3493,6 +4216,231 @@ export type ResetTeleconsultsApiCronsTeleconsultsResetGetResponse = unknown;
 export type HealthCheckApiRenderHealthGetResponse = SuccessResp;
 
 export type DbConnsApiRenderDbConnGetResponse = unknown;
+
+export type HealthReportAdminHealthReportPostData = {
+    requestBody: Array<(string)>;
+};
+
+export type HealthReportAdminHealthReportPostResponse = unknown;
+
+export type ExportHealthReportAdminHealthReportExportPostData = {
+    requestBody: Array<(string)>;
+};
+
+export type ExportHealthReportAdminHealthReportExportPostResponse = unknown;
+
+export type GetServerTimeTimeServerGetResponse = unknown;
+
+export type GetAllSpecialisationsGetData = {
+    includeItems?: boolean;
+    includeServices?: boolean;
+    includeSpecialists?: boolean;
+};
+
+export type GetAllSpecialisationsGetResponse = Array<SpecialisationResponse>;
+
+export type CreateSpecialisationsPostData = {
+    formData: Body_create_specialisations__post;
+};
+
+export type CreateSpecialisationsPostResponse = SpecialisationResponse;
+
+export type GetActiveSpecialisationsActiveGetData = {
+    includeItems?: boolean;
+    includeServices?: boolean;
+    includeSpecialists?: boolean;
+};
+
+export type GetActiveSpecialisationsActiveGetResponse = Array<SpecialisationResponse>;
+
+export type GetOneSpecialisationsSpecialisationIdGetData = {
+    includeItems?: boolean;
+    includeServices?: boolean;
+    includeSpecialists?: boolean;
+    specialisationId: number;
+};
+
+export type GetOneSpecialisationsSpecialisationIdGetResponse = SpecialisationResponse;
+
+export type UpdateSpecialisationsSpecialisationIdPatchData = {
+    formData?: Body_update_specialisations__specialisation_id__patch;
+    specialisationId: number;
+};
+
+export type UpdateSpecialisationsSpecialisationIdPatchResponse = SpecialisationResponse;
+
+export type DeleteSpecialisationsSpecialisationIdDeleteData = {
+    specialisationId: number;
+};
+
+export type DeleteSpecialisationsSpecialisationIdDeleteResponse = unknown;
+
+export type GetAllSpecialistsGetResponse = Array<SpecialistResponse>;
+
+export type CreateSpecialistsPostData = {
+    formData: Body_create_specialists__post;
+};
+
+export type CreateSpecialistsPostResponse = SpecialistResponse;
+
+export type GetActiveSpecialistsActiveGetResponse = Array<SpecialistResponse>;
+
+export type GetBySpecialisationSpecialistsBySpecialisationSpecialisationIdGetData = {
+    specialisationId: number;
+};
+
+export type GetBySpecialisationSpecialistsBySpecialisationSpecialisationIdGetResponse = Array<SpecialistResponse>;
+
+export type GetOneSpecialistsSpecialistIdGetData = {
+    specialistId: number;
+};
+
+export type GetOneSpecialistsSpecialistIdGetResponse = SpecialistResponse;
+
+export type UpdateSpecialistsSpecialistIdPatchData = {
+    formData?: Body_update_specialists__specialist_id__patch;
+    specialistId: number;
+};
+
+export type UpdateSpecialistsSpecialistIdPatchResponse = SpecialistResponse;
+
+export type DeleteSpecialistsSpecialistIdDeleteData = {
+    specialistId: number;
+};
+
+export type DeleteSpecialistsSpecialistIdDeleteResponse = unknown;
+
+export type BlockForDateSpecialistsSpecialistIdBlockPostData = {
+    formData?: Body_block_for_date_specialists__specialist_id__block_post;
+    specialistId: number;
+};
+
+export type BlockForDateSpecialistsSpecialistIdBlockPostResponse = SpecialistResponse;
+
+export type UnblockForDateSpecialistsSpecialistIdUnblockPostData = {
+    formData?: Body_unblock_for_date_specialists__specialist_id__unblock_post;
+    specialistId: number;
+};
+
+export type UnblockForDateSpecialistsSpecialistIdUnblockPostResponse = SpecialistResponse;
+
+export type GetAllAdminAppointmentRequestsAdminAllGetData = {
+    specialistId?: number | null;
+    status?: RequestStatus | null;
+};
+
+export type GetAllAdminAppointmentRequestsAdminAllGetResponse = Array<AppointmentRequestResponse>;
+
+export type GetByStatusAdminAppointmentRequestsAdminByStatusStatusGetData = {
+    status: RequestStatus;
+};
+
+export type GetByStatusAdminAppointmentRequestsAdminByStatusStatusGetResponse = Array<AppointmentRequestResponse>;
+
+export type UpdateStatusAdminAppointmentRequestsAdminRequestIdStatusPatchData = {
+    requestBody: AppointmentRequestStatusUpdate;
+    requestId: number;
+};
+
+export type UpdateStatusAdminAppointmentRequestsAdminRequestIdStatusPatchResponse = AppointmentRequestResponse;
+
+export type GetOneAdminAppointmentRequestsAdminRequestIdGetData = {
+    requestId: number;
+};
+
+export type GetOneAdminAppointmentRequestsAdminRequestIdGetResponse = AppointmentRequestResponse;
+
+export type GetMyRequestsAppointmentRequestsMyRequestsGetResponse = Array<AppointmentRequestResponse>;
+
+export type GetMyRequestDetailAppointmentRequestsMyRequestsRequestIdGetData = {
+    requestId: number;
+};
+
+export type GetMyRequestDetailAppointmentRequestsMyRequestsRequestIdGetResponse = AppointmentRequestResponse;
+
+export type RescheduleMyRequestAppointmentRequestsMyRequestsRequestIdReschedulePostData = {
+    requestBody: AppointmentRescheduleRequest;
+    requestId: number;
+};
+
+export type RescheduleMyRequestAppointmentRequestsMyRequestsRequestIdReschedulePostResponse = AppointmentRequestResponse;
+
+export type CancelMyRequestAppointmentRequestsMyRequestsRequestIdCancelPostData = {
+    requestBody: AppointmentCancelRequest;
+    requestId: number;
+};
+
+export type CancelMyRequestAppointmentRequestsMyRequestsRequestIdCancelPostResponse = AppointmentRequestResponse;
+
+export type GetAllAppointmentRequestsGetResponse = Array<AppointmentRequestResponse>;
+
+export type CreateAppointmentRequestsPostData = {
+    requestBody: AppointmentRequestCreate;
+};
+
+export type CreateAppointmentRequestsPostResponse = AppointmentRequestResponse;
+
+export type RescheduleAppointmentRequestsRequestIdReschedulePostData = {
+    requestBody: AppointmentRescheduleRequest;
+    requestId: number;
+};
+
+export type RescheduleAppointmentRequestsRequestIdReschedulePostResponse = AppointmentRequestResponse;
+
+export type CancelAppointmentRequestsRequestIdCancelPostData = {
+    requestBody: AppointmentCancelRequest;
+    requestId: number;
+};
+
+export type CancelAppointmentRequestsRequestIdCancelPostResponse = AppointmentRequestResponse;
+
+export type GetByStatusAppointmentRequestsByStatusStatusGetData = {
+    status: RequestStatus;
+};
+
+export type GetByStatusAppointmentRequestsByStatusStatusGetResponse = Array<AppointmentRequestResponse>;
+
+export type UpdateStatusAppointmentRequestsRequestIdStatusPatchData = {
+    requestBody: AppointmentRequestStatusUpdate;
+    requestId: number;
+};
+
+export type UpdateStatusAppointmentRequestsRequestIdStatusPatchResponse = AppointmentRequestResponse;
+
+export type GetOneAppointmentRequestsRequestIdGetData = {
+    requestId: number;
+};
+
+export type GetOneAppointmentRequestsRequestIdGetResponse = AppointmentRequestResponse;
+
+export type ListTemplatesEmailTemplatesGetResponse = Array<EmailTemplateResponse>;
+
+export type CreateTemplateEmailTemplatesPostData = {
+    requestBody: EmailTemplateCreate;
+};
+
+export type CreateTemplateEmailTemplatesPostResponse = EmailTemplateResponse;
+
+export type GetTemplateEmailTemplatesTemplateKeyGetData = {
+    templateKey: string;
+};
+
+export type GetTemplateEmailTemplatesTemplateKeyGetResponse = EmailTemplateResponse;
+
+export type UpdateTemplateEmailTemplatesTemplateKeyPatchData = {
+    requestBody: EmailTemplateUpdate;
+    templateKey: string;
+};
+
+export type UpdateTemplateEmailTemplatesTemplateKeyPatchResponse = EmailTemplateResponse;
+
+export type DeleteTemplateEmailTemplatesTemplateKeyDeleteData = {
+    templateKey: string;
+};
+
+export type DeleteTemplateEmailTemplatesTemplateKeyDeleteResponse = void;
+
+export type SeedDefaultTemplatesEmailTemplatesSeedPostResponse = unknown;
 
 export type $OpenApiTs = {
     '/api/auth/login': {
@@ -4830,6 +5778,44 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/notification-preferences': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: PreferenceResp;
+            };
+        };
+        patch: {
+            req: UpdatePreferencesApiNotificationPreferencesPatchData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: PreferenceResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/notification-preferences/unsubscribe': {
+        post: {
+            req: UnsubscribeViaLinkApiNotificationPreferencesUnsubscribePostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SuccessResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
     '/api/walkin/services': {
         get: {
             res: {
@@ -5050,11 +6036,16 @@ export type $OpenApiTs = {
     };
     '/api/payment_methods/': {
         get: {
+            req: GetPaymentMethodsApiPaymentMethodsGetData;
             res: {
                 /**
                  * Successful Response
                  */
                 200: PaymentMethodsResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
             };
         };
     };
@@ -6485,6 +7476,21 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/admin/appointments/v1/corporate-codes/{code_id}/quota-usage': {
+        get: {
+            req: GetCorporateCodeQuotaUsageApiAdminAppointmentsV1CorporateCodesCodeIdQuotaUsageGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: CorporateCodeQuotaUsage;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
     '/api/admin/appointments/v1/corporate-codes/{code_id}/export-survey-csv': {
         get: {
             req: ExportCorporateSurveyCsvApiAdminAppointmentsV1CorporateCodesCodeIdExportSurveyCsvGetData;
@@ -6556,6 +7562,16 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/admin/appointments/v1/onsite-hours': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<BranchOperatingHoursResponse>;
+            };
+        };
+    };
     '/api/admin/appointments/v1/sgimed-branches': {
         get: {
             res: {
@@ -6602,6 +7618,21 @@ export type $OpenApiTs = {
                  * Successful Response
                  */
                 200: SuccessResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/appointments/v1/operating-hours/{branch_id}/session-capacity': {
+        get: {
+            req: GetBranchSessionCapacityApiAdminAppointmentsV1OperatingHoursBranchIdSessionCapacityGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: BranchSessionCapacityResponse;
                 /**
                  * Validation Error
                  */
@@ -6893,6 +7924,266 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/admin/services/': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<ServiceResponse>;
+            };
+        };
+        post: {
+            req: CreateApiAdminServicesPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ServiceResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/services/active': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<ServiceResponse>;
+            };
+        };
+    };
+    '/api/admin/services/by-specialisation/{specialisation_id}': {
+        get: {
+            req: GetBySpecialisationApiAdminServicesBySpecialisationSpecialisationIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<ServiceResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/services/{service_id}': {
+        get: {
+            req: GetOneApiAdminServicesServiceIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: UnifiedServiceResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        patch: {
+            req: UpdateApiAdminServicesServiceIdPatchData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ServiceResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        delete: {
+            req: DeleteApiAdminServicesServiceIdDeleteData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/services/{service_id}/block': {
+        post: {
+            req: BlockForDateApiAdminServicesServiceIdBlockPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ServiceResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/services/{service_id}/unblock': {
+        post: {
+            req: UnblockForDateApiAdminServicesServiceIdUnblockPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: ServiceResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: CampaignListResp;
+            };
+        };
+        post: {
+            req: CreateCampaignApiAdminMarketingCampaignsPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: CampaignRow;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns/patient-preferences': {
+        get: {
+            req: ListPatientPreferencesApiAdminMarketingCampaignsPatientPreferencesGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: PatientPreferenceListResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns/{campaign_id}': {
+        get: {
+            req: GetCampaignApiAdminMarketingCampaignsCampaignIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: CampaignRow;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        delete: {
+            req: DeleteCampaignApiAdminMarketingCampaignsCampaignIdDeleteData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SuccessResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns/{campaign_id}/recipients': {
+        get: {
+            req: ListRecipientsApiAdminMarketingCampaignsCampaignIdRecipientsGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: RecipientListResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns/{campaign_id}/prepare': {
+        post: {
+            req: PrepareCampaignApiAdminMarketingCampaignsCampaignIdPreparePostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SuccessResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns/{campaign_id}/start': {
+        post: {
+            req: StartCampaignApiAdminMarketingCampaignsCampaignIdStartPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SuccessResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns/{campaign_id}/pause': {
+        post: {
+            req: PauseCampaignApiAdminMarketingCampaignsCampaignIdPausePostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SuccessResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/api/admin/marketing-campaigns/{campaign_id}/resume': {
+        post: {
+            req: ResumeCampaignApiAdminMarketingCampaignsCampaignIdResumePostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SuccessResp;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
     '/api/delivery/dispatch/': {
         get: {
             res: {
@@ -7145,6 +8436,536 @@ export type $OpenApiTs = {
                  * Successful Response
                  */
                 200: unknown;
+            };
+        };
+    };
+    '/admin/health-report': {
+        post: {
+            req: HealthReportAdminHealthReportPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/admin/health-report/export': {
+        post: {
+            req: ExportHealthReportAdminHealthReportExportPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/time/server': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+            };
+        };
+    };
+    '/specialisations/': {
+        get: {
+            req: GetAllSpecialisationsGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<SpecialisationResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        post: {
+            req: CreateSpecialisationsPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialisationResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/specialisations/active': {
+        get: {
+            req: GetActiveSpecialisationsActiveGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<SpecialisationResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/specialisations/{specialisation_id}': {
+        get: {
+            req: GetOneSpecialisationsSpecialisationIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialisationResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        patch: {
+            req: UpdateSpecialisationsSpecialisationIdPatchData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialisationResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        delete: {
+            req: DeleteSpecialisationsSpecialisationIdDeleteData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/specialists/': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<SpecialistResponse>;
+            };
+        };
+        post: {
+            req: CreateSpecialistsPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialistResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/specialists/active': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<SpecialistResponse>;
+            };
+        };
+    };
+    '/specialists/by-specialisation/{specialisation_id}': {
+        get: {
+            req: GetBySpecialisationSpecialistsBySpecialisationSpecialisationIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<SpecialistResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/specialists/{specialist_id}': {
+        get: {
+            req: GetOneSpecialistsSpecialistIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialistResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        patch: {
+            req: UpdateSpecialistsSpecialistIdPatchData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialistResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        delete: {
+            req: DeleteSpecialistsSpecialistIdDeleteData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: unknown;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/specialists/{specialist_id}/block': {
+        post: {
+            req: BlockForDateSpecialistsSpecialistIdBlockPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialistResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/specialists/{specialist_id}/unblock': {
+        post: {
+            req: UnblockForDateSpecialistsSpecialistIdUnblockPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: SpecialistResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/admin/all': {
+        get: {
+            req: GetAllAdminAppointmentRequestsAdminAllGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<AppointmentRequestResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/admin/by-status/{status}': {
+        get: {
+            req: GetByStatusAdminAppointmentRequestsAdminByStatusStatusGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<AppointmentRequestResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/admin/{request_id}/status': {
+        patch: {
+            req: UpdateStatusAdminAppointmentRequestsAdminRequestIdStatusPatchData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/admin/{request_id}': {
+        get: {
+            req: GetOneAdminAppointmentRequestsAdminRequestIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/my-requests': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<AppointmentRequestResponse>;
+            };
+        };
+    };
+    '/appointment-requests/my-requests/{request_id}': {
+        get: {
+            req: GetMyRequestDetailAppointmentRequestsMyRequestsRequestIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/my-requests/{request_id}/reschedule': {
+        post: {
+            req: RescheduleMyRequestAppointmentRequestsMyRequestsRequestIdReschedulePostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/my-requests/{request_id}/cancel': {
+        post: {
+            req: CancelMyRequestAppointmentRequestsMyRequestsRequestIdCancelPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<AppointmentRequestResponse>;
+            };
+        };
+        post: {
+            req: CreateAppointmentRequestsPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/{request_id}/reschedule': {
+        post: {
+            req: RescheduleAppointmentRequestsRequestIdReschedulePostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/{request_id}/cancel': {
+        post: {
+            req: CancelAppointmentRequestsRequestIdCancelPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/by-status/{status}': {
+        get: {
+            req: GetByStatusAppointmentRequestsByStatusStatusGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<AppointmentRequestResponse>;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/{request_id}/status': {
+        patch: {
+            req: UpdateStatusAppointmentRequestsRequestIdStatusPatchData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/appointment-requests/{request_id}': {
+        get: {
+            req: GetOneAppointmentRequestsRequestIdGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: AppointmentRequestResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/email-templates/': {
+        get: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: Array<EmailTemplateResponse>;
+            };
+        };
+        post: {
+            req: CreateTemplateEmailTemplatesPostData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                201: EmailTemplateResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/email-templates/{template_key}': {
+        get: {
+            req: GetTemplateEmailTemplatesTemplateKeyGetData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: EmailTemplateResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        patch: {
+            req: UpdateTemplateEmailTemplatesTemplateKeyPatchData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                200: EmailTemplateResponse;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+        delete: {
+            req: DeleteTemplateEmailTemplatesTemplateKeyDeleteData;
+            res: {
+                /**
+                 * Successful Response
+                 */
+                204: void;
+                /**
+                 * Validation Error
+                 */
+                422: HTTPValidationError;
+            };
+        };
+    };
+    '/email-templates/seed': {
+        post: {
+            res: {
+                /**
+                 * Successful Response
+                 */
+                201: unknown;
             };
         };
     };
