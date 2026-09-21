@@ -1,9 +1,9 @@
-import { Redirect, Stack, router } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useSession } from '../../../ctx';
 import { useEffect, useRef } from 'react';
-import { Linking } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from '@/common/utils/notifications';
+import { handleNotificationResponse, registerNotificationCategories } from '@/common/utils/notification_actions';
 import { RealtimeProvider } from '@/providers/realtime';
 import { updateExpoPushTokenApiUserUpdateExpoPushTokenPost } from '@/services/client';
 import { useCallNotificationRegistration } from '@/hooks/useCallNotificationRegistration';
@@ -29,7 +29,9 @@ export const unstable_settings = {
 
 export default function AppLayout() {
     const { user, initializing } = useSession();
-    const responseListener = useRef<Notifications.Subscription>();
+    // Also returns the notification that cold-started the app, which a plain listener misses.
+    const lastResponse = Notifications.useLastNotificationResponse();
+    const handledResponseKey = useRef<string | null>(null);
 
     // Registers this device for "doctor is calling" alerts (iOS VoIP/CallKit,
     // Android FCM) for the whole authenticated session - not just while the
@@ -54,24 +56,19 @@ export default function AppLayout() {
             }});
         }
         updateDeviceToken();
-
-        // When App is clicked from Notification Bar
-        responseListener.current =
-            Notifications.addNotificationResponseReceivedListener((response) => {
-                const trigger = response.notification.request.trigger as Notifications.PushNotificationTrigger;
-                const data = trigger.payload?.data as { pathname?: string, params?: { [key: string]: any }, url?: string };
-                if (data?.pathname) {
-                    router.navigate({ pathname: data.pathname as any, params: data.params })
-                } else if (data?.url) {
-                    Linking.openURL(data.url);
-                }
-            });
-
-        return () => {
-            responseListener.current &&
-                Notifications.removeNotificationSubscription(responseListener.current);
-        };
+        registerNotificationCategories().catch((e) => console.log('Failed to register notification categories', e));
     }, [user]);
+
+    // When a notification (or one of its buttons) is tapped - including a tap that launched the
+    // app from closed. Waits for login (and for the session check to finish, so the navigator is
+    // mounted) so the navigation and preference update have a session.
+    useEffect(() => {
+        if (initializing || !user || !lastResponse) return;
+        const key = `${lastResponse.notification.request.identifier}:${lastResponse.actionIdentifier}`;
+        if (handledResponseKey.current === key) return;
+        handledResponseKey.current = key;
+        handleNotificationResponse(lastResponse);
+    }, [initializing, user, lastResponse]);
 
     // You can keep the splash screen open, or render a loading screen like we do here.
     if (initializing) {
